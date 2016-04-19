@@ -12,6 +12,8 @@
 
 @property (strong, nonatomic) IBOutlet UILabel *dataLabel;
 @property (strong, nonatomic) id dataObject;
+@property (strong, nonatomic) IBOutlet UIButton *addEvent;
+@property (strong, nonatomic) IBOutlet UITableView *eventList;
 
 @end
 

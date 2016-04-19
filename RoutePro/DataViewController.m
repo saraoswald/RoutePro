@@ -29,4 +29,7 @@
     self.dataLabel.text = [self.dataObject description];
 }
 
+- (IBAction)addEventPressed:(UIButton*)sender{
+    NSLog(@"held 4 a long time");
+}
 @end
