@@ -10,4 +10,9 @@
 
 @interface MapViewController : UIViewController
 
+@property(nonatomic) NSString *eventTypeInput;
+@property(strong,nonatomic) IBOutlet UILabel *label;
+
+-(void) setEventTypeInput:(NSString *)eventType;
+
 @end

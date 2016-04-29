@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		49B2F71BC0BCB92ACB029DAF /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7630B7950DC3F209E7B5EF9C /* libPods.a */; };
+		C60126EF1CD1951C00BF5C82 /* MapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C60126EA1CD1951C00BF5C82 /* MapViewController.m */; };
+		C60126F01CD1951C00BF5C82 /* NSURLRequest+OAuth.m in Sources */ = {isa = PBXBuildFile; fileRef = C60126EC1CD1951C00BF5C82 /* NSURLRequest+OAuth.m */; };
+		C60126F11CD1951C00BF5C82 /* YPAPISample.m in Sources */ = {isa = PBXBuildFile; fileRef = C60126EE1CD1951C00BF5C82 /* YPAPISample.m */; };
 		C64919CD1CBF41B500580F3D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C64919CC1CBF41B500580F3D /* main.m */; };
 		C64919D01CBF41B500580F3D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C64919CF1CBF41B500580F3D /* AppDelegate.m */; };
 		C64919D31CBF41B500580F3D /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C64919D21CBF41B500580F3D /* RootViewController.m */; };
@@ -37,6 +41,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7630B7950DC3F209E7B5EF9C /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C288B71B3AEB62E69A0E5D26 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
+		C60126E91CD1951C00BF5C82 /* MapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MapViewController.h; path = RoutePro/MapViewController.h; sourceTree = "<group>"; };
+		C60126EA1CD1951C00BF5C82 /* MapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MapViewController.m; path = RoutePro/MapViewController.m; sourceTree = "<group>"; };
+		C60126EB1CD1951C00BF5C82 /* NSURLRequest+OAuth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSURLRequest+OAuth.h"; path = "RoutePro/NSURLRequest+OAuth.h"; sourceTree = "<group>"; };
+		C60126EC1CD1951C00BF5C82 /* NSURLRequest+OAuth.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSURLRequest+OAuth.m"; path = "RoutePro/NSURLRequest+OAuth.m"; sourceTree = "<group>"; };
+		C60126ED1CD1951C00BF5C82 /* YPAPISample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YPAPISample.h; path = RoutePro/YPAPISample.h; sourceTree = "<group>"; };
+		C60126EE1CD1951C00BF5C82 /* YPAPISample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YPAPISample.m; path = RoutePro/YPAPISample.m; sourceTree = "<group>"; };
 		C64919C81CBF41B500580F3D /* RoutePro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RoutePro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C64919CC1CBF41B500580F3D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C64919CE1CBF41B500580F3D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -57,6 +69,7 @@
 		C64919F21CBF41B500580F3D /* RouteProUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RouteProUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C64919F61CBF41B500580F3D /* RouteProUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RouteProUITests.m; sourceTree = "<group>"; };
 		C64919F81CBF41B500580F3D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EDB4EA33403708DCD5CFB8F5 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				49B2F71BC0BCB92ACB029DAF /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,13 +98,38 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		46AAA63750F46F24ADF4A2DA /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				C288B71B3AEB62E69A0E5D26 /* Pods.debug.xcconfig */,
+				EDB4EA33403708DCD5CFB8F5 /* Pods.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		67E29988343D8DCDDECEE8DF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7630B7950DC3F209E7B5EF9C /* libPods.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		C64919BF1CBF41B500580F3D = {
 			isa = PBXGroup;
 			children = (
+				C60126E91CD1951C00BF5C82 /* MapViewController.h */,
+				C60126EA1CD1951C00BF5C82 /* MapViewController.m */,
+				C60126EB1CD1951C00BF5C82 /* NSURLRequest+OAuth.h */,
+				C60126EC1CD1951C00BF5C82 /* NSURLRequest+OAuth.m */,
+				C60126ED1CD1951C00BF5C82 /* YPAPISample.h */,
+				C60126EE1CD1951C00BF5C82 /* YPAPISample.m */,
 				C64919CA1CBF41B500580F3D /* RoutePro */,
 				C64919EA1CBF41B500580F3D /* RouteProTests */,
 				C64919F51CBF41B500580F3D /* RouteProUITests */,
 				C64919C91CBF41B500580F3D /* Products */,
+				46AAA63750F46F24ADF4A2DA /* Pods */,
+				67E29988343D8DCDDECEE8DF /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -157,9 +196,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C64919FB1CBF41B500580F3D /* Build configuration list for PBXNativeTarget "RoutePro" */;
 			buildPhases = (
+				975E1AFA9D240F7F2B0B8719 /* Check Pods Manifest.lock */,
 				C64919C41CBF41B500580F3D /* Sources */,
 				C64919C51CBF41B500580F3D /* Frameworks */,
 				C64919C61CBF41B500580F3D /* Resources */,
+				14C13B96CB2A66CEF0DE5B0E /* Embed Pods Frameworks */,
+				B66D57C812D9F10D59FB9563 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -278,6 +320,54 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		14C13B96CB2A66CEF0DE5B0E /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		975E1AFA9D240F7F2B0B8719 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		B66D57C812D9F10D59FB9563 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		C64919C41CBF41B500580F3D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -286,8 +376,11 @@
 				C64919D61CBF41B500580F3D /* DataViewController.m in Sources */,
 				C64919D01CBF41B500580F3D /* AppDelegate.m in Sources */,
 				C64919D91CBF41B500580F3D /* ModelController.m in Sources */,
+				C60126EF1CD1951C00BF5C82 /* MapViewController.m in Sources */,
 				C64919CD1CBF41B500580F3D /* main.m in Sources */,
+				C60126F11CD1951C00BF5C82 /* YPAPISample.m in Sources */,
 				C64919D31CBF41B500580F3D /* RootViewController.m in Sources */,
+				C60126F01CD1951C00BF5C82 /* NSURLRequest+OAuth.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -426,6 +519,7 @@
 		};
 		C64919FC1CBF41B500580F3D /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C288B71B3AEB62E69A0E5D26 /* Pods.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = RoutePro/Info.plist;
@@ -437,6 +531,7 @@
 		};
 		C64919FD1CBF41B500580F3D /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = EDB4EA33403708DCD5CFB8F5 /* Pods.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = RoutePro/Info.plist;
@@ -513,6 +608,7 @@
 				C64919FD1CBF41B500580F3D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		C64919FE1CBF41B500580F3D /* Build configuration list for PBXNativeTarget "RouteProTests" */ = {
 			isa = XCConfigurationList;
@@ -521,6 +617,7 @@
 				C6491A001CBF41B500580F3D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		C6491A011CBF41B500580F3D /* Build configuration list for PBXNativeTarget "RouteProUITests" */ = {
 			isa = XCConfigurationList;
@@ -529,6 +626,7 @@
 				C6491A031CBF41B500580F3D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -7,16 +7,15 @@
 //
 
 #import "DataViewController.h"
+#import "MapViewController.h"
 
-@interface DataViewController ()
-
-@end
 
 @implementation DataViewController
 
+@synthesize eventType;
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
 }
 
 - (void)didReceiveMemoryWarning {
@@ -30,6 +29,13 @@
 }
 
 - (IBAction)addEventPressed:(UIButton*)sender{
-    NSLog(@"held 4 a long time");
+    eventType = self.eventTypeField.text;
+}
+
+-(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+    if([segue.identifier isEqualToString:@"showMap"]){
+        MapViewController *controller = (MapViewController *)segue.destinationViewController;
+        controller.eventTypeInput = eventType;
+    }
 }
 @end
