@@ -16,8 +16,9 @@
 @property (strong, nonatomic) IBOutlet UIButton *addEvent;
 @property (strong, nonatomic) IBOutlet UITextField *eventTypeField;
 @property (strong, nonatomic) NSString *eventType;
-//@property (strong, nonatomic) IBOutlet UITableView *eventList;
-
--(NSString*) getEventType;
+@property (strong, nonatomic) NSMutableArray *eventList;
+@property (strong, nonatomic) IBOutlet UITableViewCell *eventCell;
+@property (strong, nonatomic) IBOutlet UITableView *eventListTable;
+@property (strong, nonatomic) IBOutlet UITextView *testText;
 
 @end

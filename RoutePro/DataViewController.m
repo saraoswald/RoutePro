@@ -13,9 +13,28 @@
 @implementation DataViewController
 
 @synthesize eventType;
+@synthesize eventList;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    if(!eventList){
+      eventList = [[NSMutableArray alloc] init];
+      [eventList addObject:
+        @{@"name": @"Eataly",
+          @"type": @"food"}];
+      [eventList addObject:
+        @{@"name": @"MoMa",
+          @"type": @"museum"}
+      ];
+    };
+    NSLog(@"eventType: %@",eventType);
+    NSMutableString *displayEventList = [[NSMutableString alloc] init];
+    NSString *temp = [[NSString alloc] init];
+    for(int i=0;i<[eventList count]; i++){
+      temp = [NSString stringWithFormat:@"eventList[%d] = %@,%@\n",i,[eventList[i] objectForKey:@"name"],[eventList[i] objectForKey:@"type"]];
+      [displayEventList appendString:temp];
+    }
+    self.testText.text = displayEventList;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -36,6 +55,28 @@
     if([segue.identifier isEqualToString:@"showMap"]){
         MapViewController *controller = (MapViewController *)segue.destinationViewController;
         controller.eventTypeInput = eventType;
+        controller.eventList = eventList;
     }
+}
+
+// Table view stuff
+- (UITableViewCell *)eventListTable:(UITableView *)eventListTable cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+
+        static NSString *MyIdentifier = @"eventCell";
+
+        UITableViewCell *cell =[eventListTable dequeueReusableCellWithIdentifier:MyIdentifier];
+        if (cell == nil){
+            cell = [[UITableViewCell alloc] init];
+        }
+
+    cell.textLabel.text = [eventList[indexPath.row] objectForKey:@"name"];
+    NSLog(@"%@",cell.textLabel.text);
+    return cell;
+
+}
+- (NSInteger)eventListTable:(UITableView *)eventListTable numberOfRowsInSection:(NSInteger)section {
+   // Return the number of rows in the section.
+   // If you're serving data from an array, return the length of the array:
+   return [eventList count];
 }
 @end

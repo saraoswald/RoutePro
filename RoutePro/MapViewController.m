@@ -19,7 +19,7 @@
 }
 
 @synthesize eventTypeInput;
-
+@synthesize eventList;
 
 - (void)viewDidLoad {
     ///////////////////
@@ -32,6 +32,11 @@
     // Get the term from form input in DataViewController
     self.label.text = self.eventTypeInput;
     // the string from the other view is eventTypeInput
+    if(eventTypeInput)
+      [eventList addObject:@{
+          @"name":@"addedone",
+          @"type":eventTypeInput}
+      ];
 
   //  //Get the term and location from the command line if there were any, otherwise assign default values.
   //  NSString *term = [[NSUserDefaults standardUserDefaults] valueForKey:@"term"] ?: defaultTerm;
@@ -81,5 +86,11 @@
     ///////////////////
     ///////////////////
 }
-
+-(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+    if([segue.identifier isEqualToString:@"showForm"]){
+      DataViewController *controller = (DataViewController *)segue.destinationViewController;
+      controller.eventType = eventTypeInput;
+      controller.eventList = eventList;
+    }
+  };
 @end
