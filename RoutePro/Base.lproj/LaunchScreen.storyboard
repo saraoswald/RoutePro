@@ -8,6 +8,8 @@
         <!--View Controller-->
         <scene sceneID="bMc-2l-uSP">
             <objects>
+                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.5" id="zD8-Oi-XDE"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="eEs-ya-jt0" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController id="TGI-U6-fyC" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="iAO-AI-fOU"/>
@@ -27,8 +29,6 @@
                     </view>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina55"/>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="eEs-ya-jt0" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.5" id="zD8-Oi-XDE"/>
             </objects>
             <point key="canvasLocation" x="-599" y="-255"/>
         </scene>
