@@ -22,5 +22,6 @@
 @property (strong, nonatomic) IBOutlet UITableViewCell *eventCell;
 @property (strong, nonatomic) IBOutlet UITableView *eventListTable;
 @property (strong, nonatomic) IBOutlet UITextView *testText;
+@property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
 
 @end

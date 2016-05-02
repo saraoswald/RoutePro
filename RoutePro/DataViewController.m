@@ -19,22 +19,36 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     if(!eventList){
-      eventList = [[NSMutableArray alloc] init];
-//      [eventList addObject:
-//        @{@"name": @"Eataly",
-//          @"type": @"food"}];
-//      [eventList addObject:
-//        @{@"name": @"MoMa",
-//          @"type": @"museum"}
-//      ];
+        eventList = [[NSMutableArray alloc] init];
+              [eventList addObject:
+                @{@"name": @"Eataly",
+                  @"type": @"food"}];
+              [eventList addObject:
+                @{@"name": @"MoMa",
+                  @"type": @"museum"}
+              ];
     };
+    NSLog(@"eventType: %@",eventType);
     NSMutableString *displayEventList = [[NSMutableString alloc] init];
     NSString *temp = [[NSString alloc] init];
     for(int i=0;i<[eventList count]; i++){
-      temp = [NSString stringWithFormat:@"eventList[%d] = %@,%@\n",i,[eventList[i] objectForKey:@"name"],[eventList[i] objectForKey:@"type"]];
-      [displayEventList appendString:temp];
+        temp = [NSString stringWithFormat:@"eventList[%d] = %@,%@\n",i,[eventList[i] objectForKey:@"name"],[eventList[i] objectForKey:@"type"]];
+        [displayEventList appendString:temp];
     }
-    self.testText.text = displayEventList;
+
+
+    UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
+    UIColor *white = [UIColor colorWithWhite:1.0 alpha:1.0];
+    UIEdgeInsets insets = {0, 50, 0, 50};
+    for(int i=0;i<[eventList count];i++){
+        UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(10, 100+(i*50), 200, 40)];
+        [newEvent setLayoutMargins:insets];
+        [newEvent setTextColor:white];
+        [newEvent setBackgroundColor:turquoise];
+        [newEvent setText:[[eventList objectAtIndex:i] objectForKey:@"name"]];
+        [self.scrollView addSubview:newEvent];
+    }
+
 }
 
 - (void)didReceiveMemoryWarning {
@@ -44,20 +58,19 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    self.dataLabel.text = [self.dataObject description];
 }
 
 - (IBAction)addEventPressed:(UIButton*)sender{
     eventType = self.eventTypeField.text;
     eventType1 = self.eventTypeField1.text;
-    [eventList addObject:
-     @{@"name": @"MoMa",
-       @"type": eventType}
-     ];
-    [eventList addObject:
-     @{@"name": @"MoMa",
-       @"type": eventType1}
-     ];
+//    [eventList addObject:
+//     @{@"name": @"MoMa",
+//       @"type": eventType}
+//     ];
+//    [eventList addObject:
+//     @{@"name": @"MoMa",
+//       @"type": eventType1}
+//     ];
 }
 
 -(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
@@ -67,26 +80,5 @@
         controller.eventTypeInput1 = eventType1;
         controller.eventList = eventList;
     }
-}
-
-// Table view stuff
-- (UITableViewCell *)eventListTable:(UITableView *)eventListTable cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-
-        static NSString *MyIdentifier = @"eventCell";
-
-        UITableViewCell *cell =[eventListTable dequeueReusableCellWithIdentifier:MyIdentifier];
-        if (cell == nil){
-            cell = [[UITableViewCell alloc] init];
-        }
-
-    cell.textLabel.text = [eventList[indexPath.row] objectForKey:@"name"];
-    NSLog(@"%@",cell.textLabel.text);
-    return cell;
-
-}
-- (NSInteger)eventListTable:(UITableView *)eventListTable numberOfRowsInSection:(NSInteger)section {
-   // Return the number of rows in the section.
-   // If you're serving data from an array, return the length of the array:
-   return [eventList count];
 }
 @end
