@@ -16,12 +16,20 @@ static NSString * const kSearchLimit       = @"3";
 
 #pragma mark - Public
 
-- (void)queryTopBusinessInfoForTerm:(NSString *)term location:(NSString *)location completionHandler:(void (^)(NSDictionary *topBusinessJSON, NSError *error))completionHandler {
+- (void)queryTopBusinessInfoForTerm:(NSString *)term location:(NSString *)location cll:(NSString*)cll completionHandler:(void (^)(NSDictionary *topBusinessJSON, NSError *error))completionHandler {
     
     NSLog(@"Querying the Search API with term \'%@\' and location \'%@'", term, location);
     
     //Make a first request to get the search results with the passed term and location
-    NSURLRequest *searchRequest = [self _searchRequestWithTerm:term location:location];
+    NSURLRequest *searchRequest = [self _searchRequestWithTerm:term location:location cll:cll];
+    
+    
+    
+    NSString *requestPath = [[searchRequest URL] absoluteString];
+    NSLog(requestPath);
+    
+    
+    
     NSURLSession *session = [NSURLSession sharedSession];
     [[session dataTaskWithRequest:searchRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         
@@ -35,7 +43,7 @@ static NSString * const kSearchLimit       = @"3";
             if ([businessArray count] > 0) {
                 NSDictionary *firstBusiness = [businessArray firstObject];
                 NSString *firstBusinessID = firstBusiness[@"id"];
-                NSLog(@"%lu businesses found, querying business info for the top result: %@", (unsigned long)[businessArray count], firstBusinessID);
+//                NSLog(@"%lu businesses found, querying business info for the top result: %@", (unsigned long)[businessArray count], firstBusinessID);
                 
                 [self queryBusinessInfoForBusinessId:firstBusinessID completionHandler:completionHandler];
             } else {
@@ -76,10 +84,11 @@ static NSString * const kSearchLimit       = @"3";
  
  @return The NSURLRequest needed to perform the search
  */
-- (NSURLRequest *)_searchRequestWithTerm:(NSString *)term location:(NSString *)location {
+- (NSURLRequest *)_searchRequestWithTerm:(NSString *)term location:(NSString *)location cll:(NSString*)cll{
     NSDictionary *params = @{
                              @"term": term,
-                             @"location": location,
+                             //@"location": location,
+                             @"ll": cll,
                              @"limit": kSearchLimit
                              };
     

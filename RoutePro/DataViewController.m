@@ -13,6 +13,7 @@
 @implementation DataViewController
 
 @synthesize eventType;
+@synthesize eventType1;
 @synthesize eventList;
 
 - (void)viewDidLoad {
@@ -27,7 +28,6 @@
           @"type": @"museum"}
       ];
     };
-    NSLog(@"eventType: %@",eventType);
     NSMutableString *displayEventList = [[NSMutableString alloc] init];
     NSString *temp = [[NSString alloc] init];
     for(int i=0;i<[eventList count]; i++){
@@ -49,12 +49,14 @@
 
 - (IBAction)addEventPressed:(UIButton*)sender{
     eventType = self.eventTypeField.text;
+    eventType1 = self.eventTypeField1.text;
 }
 
 -(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     if([segue.identifier isEqualToString:@"showMap"]){
         MapViewController *controller = (MapViewController *)segue.destinationViewController;
         controller.eventTypeInput = eventType;
+        controller.eventTypeInput1 = eventType1;
         controller.eventList = eventList;
     }
 }

@@ -13,6 +13,8 @@
 	</array>
 	<key>LSApplicationCategoryType</key>
 	<string></string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Finding nearby businesses</string>
 	<key>CFBundleIdentifier</key>
 	<string>nyu.edu.mapsAPItest</string>
 	<key>CFBundleInfoDictionaryVersion</key>

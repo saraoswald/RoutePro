@@ -7,11 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreLocation/CoreLocation.h>
 
-@interface MapViewController : UIViewController
+@interface MapViewController : UIViewController <CLLocationManagerDelegate>
 
+
+@property (nonatomic,retain) CLLocationManager *locationManager;
 @property(nonatomic) NSString *eventTypeInput;
+@property(nonatomic) NSString *eventTypeInput1;
 @property(strong,nonatomic) IBOutlet UILabel *label;
 @property (strong, nonatomic) NSMutableArray *eventList;
+@property (strong, nonatomic) NSMutableArray *locationList;
 
 @end
