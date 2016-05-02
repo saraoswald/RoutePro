@@ -20,13 +20,13 @@
     [super viewDidLoad];
     if(!eventList){
       eventList = [[NSMutableArray alloc] init];
-      [eventList addObject:
-        @{@"name": @"Eataly",
-          @"type": @"food"}];
-      [eventList addObject:
-        @{@"name": @"MoMa",
-          @"type": @"museum"}
-      ];
+//      [eventList addObject:
+//        @{@"name": @"Eataly",
+//          @"type": @"food"}];
+//      [eventList addObject:
+//        @{@"name": @"MoMa",
+//          @"type": @"museum"}
+//      ];
     };
     NSMutableString *displayEventList = [[NSMutableString alloc] init];
     NSString *temp = [[NSString alloc] init];
@@ -50,6 +50,14 @@
 - (IBAction)addEventPressed:(UIButton*)sender{
     eventType = self.eventTypeField.text;
     eventType1 = self.eventTypeField1.text;
+    [eventList addObject:
+     @{@"name": @"MoMa",
+       @"type": eventType}
+     ];
+    [eventList addObject:
+     @{@"name": @"MoMa",
+       @"type": eventType1}
+     ];
 }
 
 -(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
