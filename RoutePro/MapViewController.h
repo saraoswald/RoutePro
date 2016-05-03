@@ -18,5 +18,6 @@
 @property(strong,nonatomic) IBOutlet UILabel *label;
 @property (strong, nonatomic) NSMutableArray *eventList;
 @property (strong, nonatomic) NSMutableArray *locationList;
+@property (strong, nonatomic) NSMutableArray *colorList;
 
 @end

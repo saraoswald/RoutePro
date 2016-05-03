@@ -15,6 +15,12 @@
 #import <CoreLocation/CoreLocation.h>
 @import GoogleMaps;
 
+static NSString * const kAPIHost           = @"maps.googleapis.com/maps/api/directions";
+static NSString * const kAPIPath           = @"/json";
+static NSString * kOriginCoor              = @"";
+static NSString * kDestinationCoor         = @"";
+static NSString * const kAPIKey            = @"AIzaSyA0SZqFvrE8niKTfOrQsH42NznqqG6Fpgs";
+
 @implementation MapViewController {
     GMSMapView *mapView_;
 }
@@ -24,12 +30,18 @@
 @synthesize eventList;
 @synthesize locationManager;
 @synthesize locationList;
+@synthesize colorList;
 
 - (void)viewDidLoad {
     ///////////////////
     ///////////////////
     [super viewDidLoad];
-
+    colorList = [[NSMutableArray alloc] init];
+    [colorList addObject:[UIColor redColor]];
+    [colorList addObject:[UIColor blueColor]];
+    [colorList addObject:[UIColor greenColor]];
+    [colorList addObject:[UIColor blackColor]];
+    [colorList addObject:[UIColor yellowColor]];
 //    NSString *defaultTerm = self.eventTypeInput;
 //    NSString *defaultLocation = @"New York, NY";
     locationList = [[NSMutableArray alloc] init];
@@ -98,81 +110,96 @@
     
     //pins all locations in locationList
     NSLog(@"%lu", (unsigned long)[locationList count]);
+    NSString *startLoc = cll;
+    NSString *destLoc = [[NSString alloc] init];
+    int colorCode = 0;
     for(id location in locationList){
-        NSLog(@"I'm walking on sunshine");
         GMSMarker *marker = [[GMSMarker alloc] init];
         marker.position = CLLocationCoordinate2DMake([location[@"latitude"] floatValue], [location[@"longitude"] floatValue]);
         NSString *destinationName=location[@"name"];
         marker.title = destinationName;
         marker.map = mapView_;
+        destLoc = [NSString stringWithFormat:@"%f,%f",[location[@"latitude"] floatValue],[location[@"longitude"] floatValue]];
+        [self getDirectionsBetween2Points:startLoc destinationCoordinates:destLoc colorCode:colorCode];
+        startLoc = destLoc;
+        colorCode++;
     }
+//    NSString *testDestination = [NSString stringWithFormat:@"%@,%@",locationList[0][@"latitude"],locationList[0][@"longitude"]];
+//    NSString *testDestination = [NSString stringWithFormat:@"%@,%@",@"40.7617",@"-73.9819"];
+    
+//    locationList[0][@"latitude"]+@","+locationList[0][@"longitude"];
+//    [self getDirectionsBetween2Points:cll destinationCoordinates:testDestination];
+    UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
+    UIColor *white = [UIColor colorWithWhite:1.0 alpha:1.0];
+    UIButton *newEvent = [[UIButton alloc] initWithFrame:CGRectMake(10, 20, 50, 50)];
+    [newEvent setBackgroundColor:turquoise];
+    //    [newEvent setTitle:@"back" forState:UIControlStateNormal];
+    newEvent.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"listicon"]];
+    [newEvent addTarget:self
+                 action:@selector(buttonClicked)
+       forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:newEvent];
 }
 
-- (void) getDataAndDisplayMap:(NSString*)defaultTerm defaultLocation:(NSString*)defaultLocation cll:(NSString*)cll{
-    // Get the term from form input in DataViewController
-    // defaultTerm = self.eventTypeInput;
-    // the string from the other view is eventTypeInput
-    if(eventTypeInput)
-      [eventList addObject:@{
-          @"name":@"addedone",
-          @"type":eventTypeInput}
-      ];
+-(void) buttonClicked{
+    [self performSegueWithIdentifier:@"showForm" sender:self];
+}
 
-    //Get the term and location from the command line if there were any, otherwise assign default values.
-    NSString *term = [[NSUserDefaults standardUserDefaults] valueForKey:@"term"] ?: defaultTerm;
-    NSString *location = [[NSUserDefaults standardUserDefaults] valueForKey:@"location"] ?: defaultLocation;
-   
-    YPAPISample *APISample = [[YPAPISample alloc] init];
-   
-    dispatch_group_t requestGroup = dispatch_group_create();
-   
-    dispatch_group_enter(requestGroup);
-    [APISample queryTopBusinessInfoForTerm:term location:location cll:cll completionHandler:^(NSDictionary *topBusinessJSON, NSError *error) {
-   
-        if (error) {
-            NSLog(@"An error happened during the request: %@", error);
-        } else if (topBusinessJSON) {
-            //NSLog(@"Top business info: \n %@", topBusinessJSON);
+- (void) getDirectionsBetween2Points: (NSString*) startCoordinates destinationCoordinates: (NSString*)destinationCoordinates colorCode: (int) colorCode{
+    colorCode = colorCode % [colorList count];
+    NSLog(@"Got directions between %@, %@", startCoordinates, destinationCoordinates);
+    kOriginCoor = startCoordinates;
+    kDestinationCoor = destinationCoordinates;
+    NSDictionary *params = @{
+                             //                             @"key": kAPIKey,
+                             @"destination": destinationCoordinates,
+                             @"origin": startCoordinates
+                             };
+    NSURLRequest *directionRequest = [NSURLRequest requestWithHost:kAPIHost path:kAPIPath params:params];
+    //    NSString *requestPath = [[directionRequest URL] absoluteString];
+    NSURLSession *session = [NSURLSession sharedSession];
+    [[session dataTaskWithRequest:directionRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+        
+        if (!error && httpResponse.statusCode == 200) {
+            NSDictionary *searchResponseJSON = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+            
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSDictionary* locations = topBusinessJSON[@"location"];
-                NSNumber *latitude = locations[@"coordinate"][@"latitude"];
-                NSNumber *longitutde = locations[@"coordinate"][@"longitude"];
-                GMSCameraPosition *camera = [GMSCameraPosition cameraWithLatitude:[latitude floatValue]
-                                                                        longitude:[longitutde floatValue]
-                                                                             zoom:15];
-                mapView_ = [GMSMapView mapWithFrame:CGRectZero camera:camera];
-                mapView_.mapType = kGMSTypeNormal;
-                mapView_.myLocationEnabled = YES;
-                self.view = mapView_;
-   
-                // Creates a marker in the center of the map.
-                GMSMarker *marker = [[GMSMarker alloc] init];
-                marker.position = CLLocationCoordinate2DMake([latitude floatValue], [longitutde floatValue]);
-                NSString *destinationName=topBusinessJSON[@"name"];
-                marker.title = destinationName;
-                marker.snippet = locations[@"city"];
-                marker.map = mapView_;
-                
+                NSMutableArray *routes =searchResponseJSON[@"routes"];
+                NSDictionary *firstRoute = routes[0];
+                NSString *polyLineEncoded = firstRoute[@"overview_polyline"][@"points"];
+                GMSPolyline *polyPath = [GMSPolyline polylineWithPath:[GMSPath pathFromEncodedPath:polyLineEncoded]];
+                polyPath.strokeColor        = colorList[colorCode];
+                polyPath.strokeWidth        = 3.5f;
+                polyPath.map                = mapView_;
             });
+            
+            
+            
+            //            } else {
+            //                NSLog(@"Not enough lines");
+            //                //completionHandler(nil, error); // No business was found
+            //            }
         } else {
-            NSLog(@"No business was found");
+            NSLog(@"error");
+            //completionHandler(nil, error); // An error happened or the HTTP response is not a 200 OK
         }
-   
-        dispatch_group_leave(requestGroup);
-    }];
-   
-    dispatch_group_wait(requestGroup, DISPATCH_TIME_FOREVER); // This avoids the program exiting before all our asynchronous callbacks have been made.
-
-    ///////////////////
-    ///////////////////
+    }] resume];
+    
 }
 
 -(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     if([segue.identifier isEqualToString:@"showForm"]){
-      DataViewController *controller = (DataViewController *)segue.destinationViewController;
-      controller.eventType = eventTypeInput;
-        controller.eventType1 = eventTypeInput1;
-      controller.eventList = eventList;
+        DataViewController *controller = (DataViewController *)segue.destinationViewController;
+        NSLog(@"length of eventlist on segue: %lu",(unsigned long)[eventList count]);
+        controller.eventType = eventTypeInput;
+        controller.eventList =  [NSMutableArray arrayWithObjects:
+                                 @{@"name": @"The Halal Guys",
+                                   @"type": @"food"},
+                                 @{@"name": @"The Museum of Modern Art",
+                                   @"type": @"museum"}, nil
+                                 ];
     }
   };
 
