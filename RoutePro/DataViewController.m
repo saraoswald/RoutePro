@@ -17,21 +17,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    //    if(!eventList){
-    //        eventList = [[NSMutableArray alloc] init];
-    //              [eventList addObject:
-    //                @{@"name": @"Eataly",
-    //                  @"type": @"food"}];
-    //              [eventList addObject:
-    //                @{@"name": @"MoMa",
-    //                  @"type": @"museum"}
-    //              ];
-    //    };
     if(!eventList){
         eventList = [[NSMutableArray alloc] init];
     }
-    NSLog(@"eventType: %@",eventType);
-    NSLog(@"eventList %lu",[eventList count]);
     NSMutableString *displayEventList = [[NSMutableString alloc] init];
     NSString *temp = [[NSString alloc] init];
     for(int i=0;i<[eventList count]; i++){
@@ -59,7 +47,7 @@
         UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+40, width, 90)];
         [newEvent setTextColor:white];
         [newEvent setBackgroundColor:turquoise];
-        NSString *text = [NSString stringWithFormat:@"  %@\r%@",[[eventList objectAtIndex:i] objectForKey:@"name"],@"9am"];
+        NSString *text = [NSString stringWithFormat:@"  %@\r  %@",[[eventList objectAtIndex:i] objectForKey:@"name"],[[eventList objectAtIndex:i] objectForKey:@"type"]];
         [newEvent setText:text];
         newEvent.numberOfLines = 0;
         [self.scrollView addSubview:newEvent];
@@ -92,22 +80,24 @@
 }
 
 - (IBAction)addEventPressed:(UIButton*)sender{
-    eventType = self.eventTypeField.text;
-    [eventList addObject:
-     @{@"name": eventType,
-       @"type": eventType}
-     ];
-    
-    UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
-    UIColor *white = [UIColor colorWithWhite:1.0 alpha:1.0];
-    
-    UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(50, (([eventList count]-1)*100)+40, 300, 90)];
-    [newEvent setTextColor:white];
-    [newEvent setBackgroundColor:turquoise];
-    NSString *text = [NSString stringWithFormat:@"  %@\r%@",eventType,@"  9am"];
-    [newEvent setText:text];
-    [self.scrollView addSubview:newEvent];
-    self.eventTypeField.text = @"";
+    if(![self.eventTypeField.text  isEqual: @""]){
+        eventType = self.eventTypeField.text;
+        [eventList addObject:
+         @{@"name": eventType,
+           @"type": eventType}
+         ];
+        
+        UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
+        UIColor *white = [UIColor colorWithWhite:1.0 alpha:1.0];
+        
+        UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(50, (([eventList count]-1)*100)+40, 300, 90)];
+        [newEvent setTextColor:white];
+        [newEvent setBackgroundColor:turquoise];
+        NSString *text = [NSString stringWithFormat:@"  %@\r%@",eventType,@"  9am"];
+        [newEvent setText:text];
+        [self.scrollView addSubview:newEvent];
+        self.eventTypeField.text = @"";
+    }
 }
 
 - (IBAction)goToMap:(UIButton*)sender{

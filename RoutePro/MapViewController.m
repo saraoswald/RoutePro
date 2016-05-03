@@ -66,7 +66,8 @@ static NSString * const kAPIKey            = @"AIzaSyA0SZqFvrE8niKTfOrQsH42Nznqq
 //(NSMutableArray*)eventList defaultLocation:
 - (void) getData: (NSString*)defaultLocation cll:(NSString*)cll{
     dispatch_group_t requestGroup = dispatch_group_create();
-    for(id events in eventList){
+    for(int i=0; i<[eventList count]; i++){
+        NSDictionary *events = eventList[i];
         //Get the term and location from the command line if there were any, otherwise assign default values.
         NSString *term = events[@"type"];
         NSString *location = defaultLocation;
@@ -86,8 +87,10 @@ static NSString * const kAPIKey            = @"AIzaSyA0SZqFvrE8niKTfOrQsH42Nznqq
                 NSDictionary* locations = topBusinessJSON[@"location"];
                 NSNumber *latitude = locations[@"coordinate"][@"latitude"];
                 NSNumber *longitutde = locations[@"coordinate"][@"longitude"];
+                
                 [locationList addObject:@{
                     @"name":topBusinessJSON[@"name"],
+                    @"userInput":term,
                     @"latitude":latitude,
                     @"longitude":longitutde}];
             }
@@ -109,15 +112,20 @@ static NSString * const kAPIKey            = @"AIzaSyA0SZqFvrE8niKTfOrQsH42Nznqq
     self.view = mapView_;
     
     //pins all locations in locationList
-    NSLog(@"%lu", (unsigned long)[locationList count]);
+//    NSLog(@"The length of location list at time of pinning %lu", (unsigned long)[locationList count]);
     NSString *startLoc = cll;
     NSString *destLoc = [[NSString alloc] init];
     int colorCode = 0;
-    for(id location in locationList){
+    for(int i=0; i<[eventList count]; i++){
+        //make sure that we get directions in order
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", eventList[i][@"type"]];
+        NSArray *filteredArray = [locationList filteredArrayUsingPredicate:predicate];
+        NSDictionary *location = filteredArray[0];
         GMSMarker *marker = [[GMSMarker alloc] init];
         marker.position = CLLocationCoordinate2DMake([location[@"latitude"] floatValue], [location[@"longitude"] floatValue]);
         NSString *destinationName=location[@"name"];
         marker.title = destinationName;
+        marker.snippet = location[@"userInput"];
         marker.map = mapView_;
         destLoc = [NSString stringWithFormat:@"%f,%f",[location[@"latitude"] floatValue],[location[@"longitude"] floatValue]];
         [self getDirectionsBetween2Points:startLoc destinationCoordinates:destLoc colorCode:colorCode];
@@ -147,7 +155,7 @@ static NSString * const kAPIKey            = @"AIzaSyA0SZqFvrE8niKTfOrQsH42Nznqq
 
 - (void) getDirectionsBetween2Points: (NSString*) startCoordinates destinationCoordinates: (NSString*)destinationCoordinates colorCode: (int) colorCode{
     colorCode = colorCode % [colorList count];
-    NSLog(@"Got directions between %@, %@", startCoordinates, destinationCoordinates);
+//    NSLog(@"Got directions between %@, %@", startCoordinates, destinationCoordinates);
     kOriginCoor = startCoordinates;
     kDestinationCoor = destinationCoordinates;
     NSDictionary *params = @{
@@ -190,16 +198,26 @@ static NSString * const kAPIKey            = @"AIzaSyA0SZqFvrE8niKTfOrQsH42Nznqq
 }
 
 -(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+    
+    //TODO: The length of eventList is as expected. After two rounds unexpected length for location list. Fix this.
+    
     if([segue.identifier isEqualToString:@"showForm"]){
         DataViewController *controller = (DataViewController *)segue.destinationViewController;
-        NSLog(@"length of eventlist on segue: %lu",(unsigned long)[eventList count]);
+//        NSLog(@"length of eventlist on segue: %lu",(unsigned long)[eventList count]);
         controller.eventType = eventTypeInput;
-        controller.eventList =  [NSMutableArray arrayWithObjects:
-                                 @{@"name": @"The Halal Guys",
-                                   @"type": @"food"},
-                                 @{@"name": @"The Museum of Modern Art",
-                                   @"type": @"museum"}, nil
-                                 ];
+        NSMutableArray *returnList = [[NSMutableArray alloc] init];
+        for(int i=0; i<[eventList count]; i++){
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", eventList[i][@"type"]];
+            NSArray *filteredArray = [locationList filteredArrayUsingPredicate:predicate];
+            NSDictionary *location = filteredArray[0];
+            [returnList insertObject:@{@"name":location[@"name"],
+                                       @"type":location[@"userInput"]} atIndex:i];
+        }
+        controller.eventList =  returnList;
+//        NSLog(@"REMOVING ALL OBJECTS IN MAP VIEW");
+        [locationList removeAllObjects];
+        [eventList removeAllObjects];
+//        NSLog(@"%lu", (unsigned long)[locationList count]);
     }
   };
 
@@ -234,7 +252,7 @@ static NSString * const kAPIKey            = @"AIzaSyA0SZqFvrE8niKTfOrQsH42Nznqq
     [locationManager stopUpdatingLocation];
     
     NSString* cll=[NSString stringWithFormat:@"%f,%f", location.coordinate.latitude, location.coordinate.longitude];
-    NSLog(@"Cll is %@", cll);
+//    NSLog(@"Cll is %@", cll);
     //[self getDataAndDisplayMap:self.eventTypeInput defaultLocation:@"New York, NY" cll:cll];
     [self getData:@"New York, NY" cll:cll];
     dispatch_async(dispatch_get_main_queue(), ^{

@@ -18,17 +18,12 @@ static NSString * const kSearchLimit       = @"3";
 
 - (void)queryTopBusinessInfoForTerm:(NSString *)term location:(NSString *)location cll:(NSString*)cll completionHandler:(void (^)(NSDictionary *topBusinessJSON, NSError *error))completionHandler {
     
-    NSLog(@"Querying the Search API with term \'%@\' and location \'%@'", term, location);
+//    NSLog(@"Querying the Search API with term \'%@\' and location \'%@'", term, location);
     
     //Make a first request to get the search results with the passed term and location
     NSURLRequest *searchRequest = [self _searchRequestWithTerm:term location:location cll:cll];
     
-    
-    
     NSString *requestPath = [[searchRequest URL] absoluteString];
-    NSLog(requestPath);
-    
-    
     
     NSURLSession *session = [NSURLSession sharedSession];
     [[session dataTaskWithRequest:searchRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
