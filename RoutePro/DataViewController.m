@@ -26,7 +26,8 @@
     }
     NSMutableString *displayEventList = [[NSMutableString alloc] init];
     NSString *temp = [[NSString alloc] init];
-    for(int i=0;i<[[allInfo eventList] count]; i++){
+//    for(int i=0;i<[[allInfo eventList] count]; i++){
+    for(int i=0;i<[allInfo size]; i++){
         temp = [NSString stringWithFormat:@"eventList[%d] = %@,%@\n",i,[[allInfo eventList][i] objectForKey:@"name"],[[allInfo eventList][i] objectForKey:@"type"]];
         [displayEventList appendString:temp];
     }
@@ -37,7 +38,8 @@
     UIEdgeInsets insets = {0, 50, 0, 50};
     int leftmargin = 50;
     int width = 300;
-    for(int i=0;i<[[allInfo eventList] count];i++){
+//    for(int i=0;i<[[allInfo locationList] count];i++){
+    for(int i=0;i<[allInfo size];i++){
         UILabel *newTransit = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+10, width, 30)];
         [newTransit setLayoutMargins:insets];
         [newTransit setTextColor:turquoise];
@@ -51,12 +53,13 @@
         UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+40, width, 90)];
         [newEvent setTextColor:white];
         [newEvent setBackgroundColor:turquoise];
-        
-        int LLSize = [[allInfo locationList] count];
-        
         //TODO: find out why sometimes events are shown out of order in which they were input. Maybe switch to filters used in MVC.
         
-        NSString *text = [NSString stringWithFormat:@"  %@\r  %@",[[[allInfo locationList] objectAtIndex:LLSize-1-i] objectForKey:@"name"],[[[allInfo locationList] objectAtIndex:LLSize-1-i] objectForKey:@"userInput"]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo locationList][[allInfo size]-1-i][@"userInput"]];
+        NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
+        NSDictionary *location = filteredArray[0];
+        
+        NSString *text = [NSString stringWithFormat:@"  %@\r  %@",[location objectForKey:@"name"],[location objectForKey:@"userInput"]];
         [newEvent setText:text];
         newEvent.numberOfLines = 0;
         [self.scrollView addSubview:newEvent];
@@ -93,20 +96,25 @@
     SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
     if(![self.eventTypeField.text  isEqual: @""]){
         eventType = self.eventTypeField.text;
-        [[allInfo eventList] addObject:
-         @{@"name": eventType,
-           @"type": eventType}
-         ];
         
-        UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
-        UIColor *white = [UIColor colorWithWhite:1.0 alpha:1.0];
         
-        UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(50, (([[allInfo eventList] count]-1)*100)+40, 300, 90)];
-        [newEvent setTextColor:white];
-        [newEvent setBackgroundColor:turquoise];
-        NSString *text = [NSString stringWithFormat:@"  %@\r%@",eventType,@"  9am"];
-        [newEvent setText:text];
-        [self.scrollView addSubview:newEvent];
+        if([[allInfo userInputs] containsObject:@{@"name": eventType,
+                                                 @"type": eventType}]==NO){
+            [[allInfo userInputs] insertObject:@{@"name": eventType,
+                                                 @"type": eventType} atIndex:[allInfo size]];
+            [allInfo setSize:[allInfo size]+1];
+            
+            UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
+            UIColor *white = [UIColor colorWithWhite:1.0 alpha:1.0];
+            
+            UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(50, (([allInfo size]-1)*100)+40, 300, 90)];
+            [newEvent setTextColor:white];
+            [newEvent setBackgroundColor:turquoise];
+            NSString *text = [NSString stringWithFormat:@"  %@\r%@",eventType,@"  9am"];
+            [newEvent setText:text];
+            [self.scrollView addSubview:newEvent];
+        
+        }
         self.eventTypeField.text = @"";
     }
 }

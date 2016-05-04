@@ -41,7 +41,8 @@ static NSString * const kAPIKey            = @"AIzaSyA0SZqFvrE8niKTfOrQsH42Nznqq
     ///////////////////
     [super viewDidLoad];
     SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
-
+    [[allInfo locationList] removeAllObjects];
+    
     colorList = [[NSMutableArray alloc] init];
     [colorList addObject:[UIColor redColor]];
     [colorList addObject:[UIColor blueColor]];
@@ -50,7 +51,7 @@ static NSString * const kAPIKey            = @"AIzaSyA0SZqFvrE8niKTfOrQsH42Nznqq
     [colorList addObject:[UIColor yellowColor]];
     
     //SETFORREMOVAL
-    locationList = [[NSMutableArray alloc] init];
+//    locationList = [[NSMutableArray alloc] init];
     ////////////start up corelocation to find user location
     if([CLLocationManager locationServicesEnabled]){
         locationManager = [[CLLocationManager alloc] init];
@@ -73,8 +74,9 @@ static NSString * const kAPIKey            = @"AIzaSyA0SZqFvrE8niKTfOrQsH42Nznqq
 - (void) getData: (NSString*)defaultLocation cll:(NSString*)cll{
     dispatch_group_t requestGroup = dispatch_group_create();
     SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
-    for(int i=0; i<[[allInfo eventList] count]; i++){
-        NSDictionary *events = [allInfo eventList][i];
+//    for(int i=0; i<[[allInfo eventList] count]; i++){
+    for(int i=0; i<[allInfo size]; i++){
+        NSDictionary *events = [allInfo userInputs][i];
         NSString *term = events[@"type"];
         NSString *location = defaultLocation;
         
@@ -93,12 +95,19 @@ static NSString * const kAPIKey            = @"AIzaSyA0SZqFvrE8niKTfOrQsH42Nznqq
                 NSDictionary* locations = topBusinessJSON[@"location"];
                 NSNumber *latitude = locations[@"coordinate"][@"latitude"];
                 NSNumber *longitutde = locations[@"coordinate"][@"longitude"];
-                
-                [[allInfo locationList] addObject:@{
-                    @"name":topBusinessJSON[@"name"],
-                    @"userInput":term,
-                    @"latitude":latitude,
-                    @"longitude":longitutde}];
+                if([[allInfo locationList] containsObject:@{
+                                                            @"name":topBusinessJSON[@"name"],
+                                                            @"userInput":term,
+                                                            @"latitude":latitude,
+                                                            @"longitude":longitutde}]){
+                }
+                else{
+                    [[allInfo locationList] addObject:@{
+                        @"name":topBusinessJSON[@"name"],
+                        @"userInput":term,
+                        @"latitude":latitude,
+                        @"longitude":longitutde}];
+                }
             }
         dispatch_group_leave(requestGroup);
         }];
@@ -124,9 +133,10 @@ static NSString * const kAPIKey            = @"AIzaSyA0SZqFvrE8niKTfOrQsH42Nznqq
     NSString *startLoc = cll;
     NSString *destLoc = [[NSString alloc] init];
     int colorCode = 0;
-    for(int i=0; i<[[allInfo eventList] count]; i++){
+    for(int i=0; i<[[allInfo locationList] count]; i++){
+        NSLog(@"Mapping an item with index %d", i);
         //make sure that we get directions in order
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo eventList][i][@"type"]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo userInputs][i][@"type"]];
         NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
         NSDictionary *location = filteredArray[0];
         GMSMarker *marker = [[GMSMarker alloc] init];
@@ -209,17 +219,20 @@ static NSString * const kAPIKey            = @"AIzaSyA0SZqFvrE8niKTfOrQsH42Nznqq
         
         //TODO: Find out why this crashes after multiple cycles
         
-        for(int i=0; i<[eventList count]; i++){
-            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", eventList[i][@"type"]];
-            NSArray *filteredArray = [locationList filteredArrayUsingPredicate:predicate];
+//        for(int i=0; i<[[allInfo locationList] count]; i++){
+        for(int i=0; i<[allInfo size]; i++){
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo locationList][i][@"userInput"]];
+            NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
             NSDictionary *location = filteredArray[0];
-            
-            [[allInfo eventList] addObject:@{@"name":location[@"name"],
-                                       @"type":location[@"userInput"]}];
+            if([[allInfo eventList] containsObject:@{@"name":location[@"name"],
+                                                     @"type":location[@"userInput"]}]==NO){
+                [[allInfo eventList] addObject:@{@"name":location[@"name"],
+                                           @"type":location[@"userInput"]}];
+            }
         }
         controller.eventList =  [allInfo eventList];
-        [locationList removeAllObjects];
-        [eventList removeAllObjects];
+//        [locationList removeAllObjects];
+//        [eventList removeAllObjects];
     }
   };
 

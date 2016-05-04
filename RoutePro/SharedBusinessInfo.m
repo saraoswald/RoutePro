@@ -18,6 +18,8 @@
 @synthesize SelectedBusinesses;
 @synthesize eventList;
 @synthesize locationList;
+@synthesize userInputs;
+@synthesize size;
 
 + (id)sharedBusinessInfo{
     static SharedBusinessInfo *sharedInfo = nil;
@@ -35,6 +37,8 @@
         SelectedBusinesses = [[NSMutableArray alloc] init];
         eventList = [[NSMutableArray alloc] init];
         locationList = [[NSMutableArray alloc] init];
+        userInputs = [[NSMutableArray alloc] init];
+        size=0;
     }
     return self;
 };

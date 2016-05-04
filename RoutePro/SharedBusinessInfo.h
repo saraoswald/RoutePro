@@ -14,6 +14,8 @@
     NSMutableArray *SelectedBusinesses;
     NSMutableArray *eventList;
     NSMutableArray *locationList;
+    NSMutableArray *userInputs;
+    int size;
 }
 
 @property (nonatomic, retain) NSString *coolbeans;
@@ -21,6 +23,8 @@
 @property (nonatomic, retain) NSMutableArray *SelectedBusinesses;
 @property (nonatomic, retain) NSMutableArray *eventList;
 @property (nonatomic, retain) NSMutableArray *locationList;
+@property (nonatomic, retain) NSMutableArray *userInputs;
+@property int size;
 
 + (id)sharedBusinessInfo;
 - (void)addText;
