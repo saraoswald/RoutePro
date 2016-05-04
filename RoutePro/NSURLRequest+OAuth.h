@@ -2,9 +2,7 @@
 //  NSURLRequest+OAuth.h
 //  YelpAPISample
 //
-//  Created by Thibaud Robelain on 7/2/14.
-//  Copyright (c) 2014 Yelp Inc. All rights reserved.
-//
+
 
 #import <Foundation/Foundation.h>
 

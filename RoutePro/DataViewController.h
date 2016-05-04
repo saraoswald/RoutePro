@@ -23,5 +23,6 @@
 @property (strong, nonatomic) IBOutlet UITableView *eventListTable;
 @property (strong, nonatomic) IBOutlet UITextView *testText;
 @property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (nonatomic,retain) CLLocationManager *locationManager;
 
 @end

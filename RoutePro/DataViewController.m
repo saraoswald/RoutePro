@@ -8,7 +8,7 @@
 
 #import "DataViewController.h"
 #import "MapViewController.h"
-
+#import "SharedBusinessInfo.h"
 
 @implementation DataViewController
 
@@ -17,13 +17,17 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    //singleton testing
+    SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
+    //SETFORREMOVAL
     if(!eventList){
         eventList = [[NSMutableArray alloc] init];
     }
     NSMutableString *displayEventList = [[NSMutableString alloc] init];
     NSString *temp = [[NSString alloc] init];
-    for(int i=0;i<[eventList count]; i++){
-        temp = [NSString stringWithFormat:@"eventList[%d] = %@,%@\n",i,[eventList[i] objectForKey:@"name"],[eventList[i] objectForKey:@"type"]];
+    for(int i=0;i<[[allInfo eventList] count]; i++){
+        temp = [NSString stringWithFormat:@"eventList[%d] = %@,%@\n",i,[[allInfo eventList][i] objectForKey:@"name"],[[allInfo eventList][i] objectForKey:@"type"]];
         [displayEventList appendString:temp];
     }
     
@@ -33,21 +37,26 @@
     UIEdgeInsets insets = {0, 50, 0, 50};
     int leftmargin = 50;
     int width = 300;
-    for(int i=0;i<[eventList count];i++){
+    for(int i=0;i<[[allInfo eventList] count];i++){
         UILabel *newTransit = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+10, width, 30)];
         [newTransit setLayoutMargins:insets];
         [newTransit setTextColor:turquoise];
         [newTransit setBackgroundColor:white];
         [newTransit setFont:[UIFont systemFontOfSize:12]];
         [newTransit setTextAlignment:NSTextAlignmentCenter];
-        [newTransit setText:@"walk for 10 mins"];
+//        [newTransit setText:@"walk for 10 mins"];
         newTransit.numberOfLines = 0;
         [self.scrollView addSubview:newTransit];
         
         UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+40, width, 90)];
         [newEvent setTextColor:white];
         [newEvent setBackgroundColor:turquoise];
-        NSString *text = [NSString stringWithFormat:@"  %@\r  %@",[[eventList objectAtIndex:i] objectForKey:@"name"],[[eventList objectAtIndex:i] objectForKey:@"type"]];
+        
+        int LLSize = [[allInfo locationList] count];
+        
+        //TODO: find out why sometimes events are shown out of order in which they were input. Maybe switch to filters used in MVC.
+        
+        NSString *text = [NSString stringWithFormat:@"  %@\r  %@",[[[allInfo locationList] objectAtIndex:LLSize-1-i] objectForKey:@"name"],[[[allInfo locationList] objectAtIndex:LLSize-1-i] objectForKey:@"userInput"]];
         [newEvent setText:text];
         newEvent.numberOfLines = 0;
         [self.scrollView addSubview:newEvent];
@@ -80,9 +89,11 @@
 }
 
 - (IBAction)addEventPressed:(UIButton*)sender{
+    //TODO: possibly make allInfo a property of the class
+    SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
     if(![self.eventTypeField.text  isEqual: @""]){
         eventType = self.eventTypeField.text;
-        [eventList addObject:
+        [[allInfo eventList] addObject:
          @{@"name": eventType,
            @"type": eventType}
          ];
@@ -90,7 +101,7 @@
         UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
         UIColor *white = [UIColor colorWithWhite:1.0 alpha:1.0];
         
-        UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(50, (([eventList count]-1)*100)+40, 300, 90)];
+        UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(50, (([[allInfo eventList] count]-1)*100)+40, 300, 90)];
         [newEvent setTextColor:white];
         [newEvent setBackgroundColor:turquoise];
         NSString *text = [NSString stringWithFormat:@"  %@\r%@",eventType,@"  9am"];
@@ -110,4 +121,7 @@
         controller.eventList = eventList;
     }
 }
+
+
+
 @end
