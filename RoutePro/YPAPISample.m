@@ -3,6 +3,7 @@
 //  YelpAPI
 
 #import "YPAPISample.h"
+#import "SharedBusinessInfo.h"
 
 /**
  Default paths and search terms used in this example
@@ -18,6 +19,7 @@ static NSString * const kSearchLimit       = @"3";
 
 - (void)queryTopBusinessInfoForTerm:(NSString *)term location:(NSString *)location cll:(NSString*)cll completionHandler:(void (^)(NSDictionary *topBusinessJSON, NSError *error))completionHandler {
    
+    SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
     //Make a first request to get the search results with the passed term and location
     NSURLRequest *searchRequest = [self _searchRequestWithTerm:term location:location cll:cll];
     
@@ -33,9 +35,21 @@ static NSString * const kSearchLimit       = @"3";
             NSDictionary *searchResponseJSON = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
             NSArray *businessArray = searchResponseJSON[@"businesses"];
             
+            if([[allInfo CachedBusinesses] containsObject:@{@"type": term,
+                                                            @"bArray": businessArray}]==NO){
+                [[allInfo CachedBusinesses] addObject:@{@"type": term,
+                                                        @"bArray": businessArray}];
+            }
+            
             if ([businessArray count] > 0) {
                 NSDictionary *firstBusiness = [businessArray firstObject];
                 NSString *firstBusinessID = firstBusiness[@"id"];
+                
+                if([[allInfo SelectedBusinesses] containsObject:@{@"type": term,
+                                                                @"bName": firstBusiness[@"name"]}]==NO){
+                    [[allInfo SelectedBusinesses] addObject:@{@"type": term,
+                                                            @"bName": firstBusiness[@"name"]}];
+                }
                 
                 [self queryBusinessInfoForBusinessId:firstBusinessID completionHandler:completionHandler];
             } else {

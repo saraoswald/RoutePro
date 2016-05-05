@@ -22,6 +22,7 @@ static NSString * const kAPIPath2          = @"distancematrix/json";
 static NSString * kOriginCoor              = @"";
 static NSString * kDestinationCoor         = @"";
 static NSString * const kAPIKey            = @"AIzaSyA0SZqFvrE8niKTfOrQsH42NznqqG6Fpgs";
+int counter = 0;
 
 @implementation MapViewController {
     GMSMapView *mapView_;
@@ -134,7 +135,10 @@ static NSString * const kAPIKey            = @"AIzaSyA0SZqFvrE8niKTfOrQsH42Nznqq
     NSString *destLoc = [[NSString alloc] init];
     int colorCode = 0;
     for(int i=0; i<[[allInfo locationList] count]; i++){
-        NSLog(@"Mapping an item with index %d", i);
+        
+        //TODO: find out why this is being called exactly twice starting second time
+        
+//        NSLog(@"Mapping an item with index %d", i);
         //make sure that we get directions in order
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo userInputs][i][@"type"]];
         NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
@@ -210,6 +214,8 @@ static NSString * const kAPIKey            = @"AIzaSyA0SZqFvrE8niKTfOrQsH42Nznqq
     SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
 //    [[allInfo eventList] removeAllObjects];
     
+    counter=0;
+    
     //TODO: Probably need to make YPAPI calls in DVC otherwise can't get business names and stuff without first visiting MVC
     
     if([segue.identifier isEqualToString:@"showForm"]){
@@ -253,22 +259,26 @@ static NSString * const kAPIKey            = @"AIzaSyA0SZqFvrE8niKTfOrQsH42Nznqq
 
 - (void)locationManager:(CLLocationManager *)manager
      didUpdateLocations:(NSArray *)locations {
-    // If it's a relatively recent event, turn off updates to save power.
-    CLLocation* location = [locations lastObject];
-    NSDate* eventDate = location.timestamp;
-    NSTimeInterval howRecent = [eventDate timeIntervalSinceNow];
-    if (fabs(howRecent) < 15.0) {
-        // If the event is recent, do something with it.
-        NSLog(@"latitude %+.6f, longitude %+.6f\n",	
-              location.coordinate.latitude,
-              location.coordinate.longitude);
+    if(counter<1){
+        counter++;
+//        NSLog(@"****In corelocation****");
+        // If it's a relatively recent event, turn off updates to save power.
+        CLLocation* location = [locations lastObject];
+        NSDate* eventDate = location.timestamp;
+        NSTimeInterval howRecent = [eventDate timeIntervalSinceNow];
+        if (fabs(howRecent) < 15.0) {
+            // If the event is recent, do something with it.
+    //        NSLog(@"latitude %+.6f, longitude %+.6f\n",	
+    //              location.coordinate.latitude,
+    //              location.coordinate.longitude);
+        }
+        [locationManager stopUpdatingLocation];
+        
+        NSString* cll=[NSString stringWithFormat:@"%f,%f", location.coordinate.latitude, location.coordinate.longitude];
+        [self getData:@"New York, NY" cll:cll];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self mapData:cll];
+        });
     }
-    [locationManager stopUpdatingLocation];
-    
-    NSString* cll=[NSString stringWithFormat:@"%f,%f", location.coordinate.latitude, location.coordinate.longitude];
-    [self getData:@"New York, NY" cll:cll];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self mapData:cll];
-    });
 }
 @end

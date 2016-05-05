@@ -55,7 +55,7 @@
         [newEvent setBackgroundColor:turquoise];
         //TODO: find out why sometimes events are shown out of order in which they were input. Maybe switch to filters used in MVC.
         
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo locationList][[allInfo size]-1-i][@"userInput"]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo userInputs][i][@"type"]];
         NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
         NSDictionary *location = filteredArray[0];
         
