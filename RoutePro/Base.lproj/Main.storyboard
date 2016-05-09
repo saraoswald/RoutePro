@@ -54,7 +54,7 @@
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="What would you like to do?" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="won-aG-Yjw">
                                 <rect key="frame" x="15" y="33" width="199" height="30"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
@@ -79,12 +79,20 @@
                                     <action selector="goToMap:" destination="078-eb-9zV" eventType="touchUpInside" id="HfK-iJ-8CV"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V6Z-eZ-O1w">
+                                <rect key="frame" x="289" y="24" width="39" height="30"/>
+                                <state key="normal" title="Reroll"/>
+                                <connections>
+                                    <action selector="rerollPressed:" destination="078-eb-9zV" eventType="touchUpInside" id="U5G-nP-fbl"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina55"/>
                     <connections>
                         <outlet property="eventTypeField" destination="won-aG-Yjw" id="AVz-Jw-RPy"/>
+                        <outlet property="rerollItems" destination="V6Z-eZ-O1w" id="c1B-0n-Qdd"/>
                         <outlet property="scrollView" destination="Xkg-fX-nD3" id="ov8-3r-WnX"/>
                         <segue destination="8G4-sx-yaW" kind="presentation" identifier="showMap" id="cwq-PT-zbk"/>
                     </connections>

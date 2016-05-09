@@ -24,5 +24,7 @@
 @property (strong, nonatomic) IBOutlet UITextView *testText;
 @property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (nonatomic,retain) CLLocationManager *locationManager;
+@property (weak, nonatomic) IBOutlet UIButton *rerollItems;
+@property int untrackedChanges;
 
 @end

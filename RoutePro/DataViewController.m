@@ -14,23 +14,17 @@
 
 @synthesize eventType;
 @synthesize eventList;
+@synthesize untrackedChanges;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    untrackedChanges=0;
     SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
     
     //SETFORREMOVAL
     if(!eventList){
         eventList = [[NSMutableArray alloc] init];
     }
-    
-    //TESTING THE REROLL FUNCTION
-//    if([allInfo redraw] == YES){
-//        [self rerollItem:0];
-//        //        [self redrawWithNewText];
-//    }
-//    
-//    [allInfo addText];
     
     NSMutableString *displayEventList = [[NSMutableString alloc] init];
     NSString *temp = [[NSString alloc] init];
@@ -142,13 +136,6 @@
 
 }
 
-//SAMPLE REROLL FUNCTION, SHOULD ATTACH TO A BUTTON EVENTUALLY
-
-- (void)rerollItem: (int) index{
-    SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
-    [allInfo rerollItem:index];
-}
-
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -170,7 +157,7 @@
             [[allInfo userInputs] insertObject:@{@"name": eventType,
                                                  @"type": eventType} atIndex:[allInfo size]];
             [allInfo setSize:[allInfo size]+1];
-            
+            untrackedChanges=untrackedChanges+1;
             UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
             UIColor *white = [UIColor colorWithWhite:1.0 alpha:1.0];
             
@@ -190,42 +177,52 @@
     [self performSegueWithIdentifier:@"showMap" sender:self];
 }
 
-//: (NSString*)newTextVals
+- (void)rerollItem: (int) index{
+    SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
+    [allInfo rerollItem:index];
+}
 
-//- (void) redrawWithNewText{
-//    SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
-//    
-//    UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
-//    UIColor *white = [UIColor colorWithWhite:1.0 alpha:1.0];
-//    UIEdgeInsets insets = {0, 50, 0, 50};
-//    int leftmargin = 50;
-//    int width = 300;
-//    for(int i=0;i<[allInfo size];i++){
-//        UILabel *newTransit = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+10, width, 30)];
-//        [newTransit setLayoutMargins:insets];
-//        [newTransit setTextColor:turquoise];
-//        [newTransit setBackgroundColor:white];
-//        [newTransit setFont:[UIFont systemFontOfSize:12]];
-//        [newTransit setTextAlignment:NSTextAlignmentCenter];
-//        [newTransit setText:@"walk for 10 mins"];
-//        newTransit.numberOfLines = 0;
-//        [self.scrollView addSubview:newTransit];
-//        
-//        UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+40, width, 90)];
-//        [newEvent setTextColor:white];
-//        [newEvent setBackgroundColor:turquoise];
-//        //TODO: find out why sometimes events are shown out of order in which they were input. Maybe switch to filters used in MVC.
-//        
-//        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo userInputs][i][@"type"]];
-//        NSArray *filteredArray = [[allInfo eventList] filteredArrayUsingPredicate:predicate];
-//        NSDictionary *event = filteredArray[0];
-//        
-//        NSString *text = [NSString stringWithFormat:@"  %@\r  %@",[event objectForKey:@"name"],[event objectForKey:@"type"]];
-//        [newEvent setText:text];
-//        newEvent.numberOfLines = 0;
-//        [self.scrollView addSubview:newEvent];
-//    }
-//}
+- (IBAction)rerollPressed:(id)sender {
+    SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
+    for(int i=0; i<[allInfo size]-untrackedChanges; i++){
+        [self rerollItem:i];
+    }
+    [self redrawWithNewText];
+}
+
+- (void) redrawWithNewText{
+    SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
+    
+    UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
+    UIColor *white = [UIColor colorWithWhite:1.0 alpha:1.0];
+    UIEdgeInsets insets = {0, 50, 0, 50};
+    int leftmargin = 50;
+    int width = 300;
+    for(int i=0;i<[allInfo size]-untrackedChanges;i++){
+        UILabel *newTransit = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+10, width, 30)];
+        [newTransit setLayoutMargins:insets];
+        [newTransit setTextColor:turquoise];
+        [newTransit setBackgroundColor:white];
+        [newTransit setFont:[UIFont systemFontOfSize:12]];
+        [newTransit setTextAlignment:NSTextAlignmentCenter];
+        [newTransit setText:@"walk for 10 mins"];
+        newTransit.numberOfLines = 0;
+        [self.scrollView addSubview:newTransit];
+        
+        UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+40, width, 90)];
+        [newEvent setTextColor:white];
+        [newEvent setBackgroundColor:turquoise];
+        
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo userInputs][i][@"type"]];
+        NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
+        NSDictionary *location = filteredArray[0];
+        
+        NSString *text = [NSString stringWithFormat:@"  %@\r  %@",[location objectForKey:@"name"],[location objectForKey:@"userInput"]];
+        [newEvent setText:text];
+        newEvent.numberOfLines = 0;
+        [self.scrollView addSubview:newEvent];
+    }
+}
 
 
 
