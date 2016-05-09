@@ -29,6 +29,6 @@
 + (id)sharedBusinessInfo;
 - (NSMutableArray*) rerollItem: (int) index;
 - (void)addText;
-
+- (void)resetItems;
 
 @end

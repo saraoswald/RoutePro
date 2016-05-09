@@ -94,6 +94,7 @@
     locationList[replaceIndex4][@"name"]=newBusinessInfo[@"name"];
     locationList[replaceIndex4][@"latitude"]=newBusinessInfo[@"location"][@"coordinate"][@"latitude"];
     locationList[replaceIndex4][@"longitude"]=newBusinessInfo[@"location"][@"coordinate"][@"longitude"];
+    locationList[replaceIndex4][@"address"]=newBusinessInfo[@"location"][@"address"];
 //
 //    [tmpObject setObject:topBusinessJSON[@"name"] forKey:@"name"];
 //    [tmpObject setObject:term forKey:@"userInput"];
@@ -103,7 +104,15 @@
     return newBusinessInfo;
 }
 
-
+- (void)resetItems{
+    redraw = NO;
+    CachedBusinesses = [[NSMutableArray alloc] init];
+    SelectedBusinesses = [[NSMutableArray alloc] init];
+    eventList = [[NSMutableArray alloc] init];
+    locationList = [[NSMutableArray alloc] init];
+    userInputs = [[NSMutableArray alloc] init];
+    size=0;
+}
 
 
 - (void)dealloc{

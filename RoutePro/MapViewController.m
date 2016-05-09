@@ -97,6 +97,7 @@ int counter = 0;
                 [tmpObject setObject:term forKey:@"userInput"];
                 [tmpObject setObject:latitude forKey:@"latitude"];
                 [tmpObject setObject:longitutde forKey:@"longitude"];
+                [tmpObject setObject:topBusinessJSON[@"location"][@"address"] forKey:@"address"];
                 
                 BOOL termContained= NO;
                 for(int i=0; i<[[allInfo locationList] count]; i++){

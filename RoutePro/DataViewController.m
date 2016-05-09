@@ -59,7 +59,7 @@
         NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
         NSDictionary *location = filteredArray[0];
         
-        NSString *text = [NSString stringWithFormat:@"  %@\r  %@",[location objectForKey:@"name"],[location objectForKey:@"userInput"]];
+        NSString *text = [NSString stringWithFormat:@"  %@\r  %@\r  %@",[location objectForKey:@"name"],[location objectForKey:@"address"][0],[location objectForKey:@"userInput"]];
         [newEvent setText:text];
         newEvent.numberOfLines = 0;
         [self.scrollView addSubview:newEvent];
@@ -190,6 +190,12 @@
     [self redrawWithNewText];
 }
 
+- (IBAction)removePressed:(id)sender {
+    SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
+    [allInfo resetItems];
+    [self redrawWithNewText];
+}
+
 - (void) redrawWithNewText{
     SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
     
@@ -217,7 +223,7 @@
         NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
         NSDictionary *location = filteredArray[0];
         
-        NSString *text = [NSString stringWithFormat:@"  %@\r  %@",[location objectForKey:@"name"],[location objectForKey:@"userInput"]];
+        NSString *text = [NSString stringWithFormat:@"  %@\r  %@\r  %@",[location objectForKey:@"name"],[location objectForKey:@"address"][0],[location objectForKey:@"userInput"]];
         [newEvent setText:text];
         newEvent.numberOfLines = 0;
         [self.scrollView addSubview:newEvent];

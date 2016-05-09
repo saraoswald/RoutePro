@@ -26,5 +26,6 @@
 @property (nonatomic,retain) CLLocationManager *locationManager;
 @property (weak, nonatomic) IBOutlet UIButton *rerollItems;
 @property int untrackedChanges;
+@property (weak, nonatomic) IBOutlet UIButton *removeButton;
 
 @end
