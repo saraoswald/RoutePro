@@ -11,7 +11,7 @@
 static NSString * const kAPIHost           = @"api.yelp.com";
 static NSString * const kSearchPath        = @"/v2/search/";
 static NSString * const kBusinessPath      = @"/v2/business/";
-static NSString * const kSearchLimit       = @"3";
+static NSString * const kSearchLimit       = @"5";
 
 @implementation YPAPISample
 
@@ -32,23 +32,28 @@ static NSString * const kSearchLimit       = @"3";
         
         if (!error && httpResponse.statusCode == 200) {
             
-            NSDictionary *searchResponseJSON = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+            NSMutableDictionary *searchResponseJSON = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
             NSArray *businessArray = searchResponseJSON[@"businesses"];
             
-            if([[allInfo CachedBusinesses] containsObject:@{@"type": term,
-                                                            @"bArray": businessArray}]==NO){
-                [[allInfo CachedBusinesses] addObject:@{@"type": term,
-                                                        @"bArray": businessArray}];
+            NSMutableDictionary *tmpObject = [[NSMutableDictionary alloc] init];
+            [tmpObject setObject:term forKey:@"type"];
+            [tmpObject setObject:businessArray forKey:@"bArray"];
+            if([[allInfo CachedBusinesses] containsObject:tmpObject]==NO){
+                [[allInfo CachedBusinesses] addObject:tmpObject];
             }
-            
+            else{
+//                NSLog(@"This object already existed in CachedBusinesses");
+            }
             if ([businessArray count] > 0) {
                 NSDictionary *firstBusiness = [businessArray firstObject];
                 NSString *firstBusinessID = firstBusiness[@"id"];
                 
-                if([[allInfo SelectedBusinesses] containsObject:@{@"type": term,
-                                                                @"bName": firstBusiness[@"name"]}]==NO){
-                    [[allInfo SelectedBusinesses] addObject:@{@"type": term,
-                                                            @"bName": firstBusiness[@"name"]}];
+                NSMutableDictionary *tmpObject = [[NSMutableDictionary alloc] init];
+                [tmpObject setObject:term forKey:@"type"];
+                [tmpObject setObject:firstBusiness[@"name"] forKey:@"bName"];
+                
+                if([[allInfo SelectedBusinesses] containsObject:tmpObject]==NO){
+                    [[allInfo SelectedBusinesses] addObject:tmpObject];
                 }
                 
                 [self queryBusinessInfoForBusinessId:firstBusinessID completionHandler:completionHandler];

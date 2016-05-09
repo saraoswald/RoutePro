@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface SharedBusinessInfo : NSObject{
-    NSString *coolbeans;
+    bool redraw;
     NSMutableArray *CachedBusinesses;
     NSMutableArray *SelectedBusinesses;
     NSMutableArray *eventList;
@@ -18,7 +18,7 @@
     int size;
 }
 
-@property (nonatomic, retain) NSString *coolbeans;
+@property bool redraw;
 @property (nonatomic, retain) NSMutableArray *CachedBusinesses;
 @property (nonatomic, retain) NSMutableArray *SelectedBusinesses;
 @property (nonatomic, retain) NSMutableArray *eventList;
@@ -27,8 +27,8 @@
 @property int size;
 
 + (id)sharedBusinessInfo;
+- (NSMutableArray*) rerollItem: (int) index;
 - (void)addText;
-- (void)printVals;
 
 
 @end

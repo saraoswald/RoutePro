@@ -38,11 +38,11 @@ int counter = 0;
 //TODO: Implement protocol for cases where Yelp API returns no results
 
 - (void)viewDidLoad {
-    ///////////////////
-    ///////////////////
     [super viewDidLoad];
     SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
-    [[allInfo locationList] removeAllObjects];
+    
+    //Instead of removing all objects, in getData check if item that will be searched for is already in locationlist. If not, search for it. Problem is that this prevents repeats (ie: can't double taco)
+//    [[allInfo locationList] removeAllObjects];
     
     colorList = [[NSMutableArray alloc] init];
     [colorList addObject:[UIColor redColor]];
@@ -51,9 +51,6 @@ int counter = 0;
     [colorList addObject:[UIColor blackColor]];
     [colorList addObject:[UIColor yellowColor]];
     
-    //SETFORREMOVAL
-//    locationList = [[NSMutableArray alloc] init];
-    ////////////start up corelocation to find user location
     if([CLLocationManager locationServicesEnabled]){
         locationManager = [[CLLocationManager alloc] init];
         [locationManager requestWhenInUseAuthorization];
@@ -67,15 +64,12 @@ int counter = 0;
         //check startUpdatingLocation callback to see calls to getDataAndDisplayMap
         [locationManager startUpdatingLocation];
     }
-    /////////////
-    
     
 }
 
 - (void) getData: (NSString*)defaultLocation cll:(NSString*)cll{
     dispatch_group_t requestGroup = dispatch_group_create();
     SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
-//    for(int i=0; i<[[allInfo eventList] count]; i++){
     for(int i=0; i<[allInfo size]; i++){
         NSDictionary *events = [allInfo userInputs][i];
         NSString *term = events[@"type"];
@@ -96,18 +90,26 @@ int counter = 0;
                 NSDictionary* locations = topBusinessJSON[@"location"];
                 NSNumber *latitude = locations[@"coordinate"][@"latitude"];
                 NSNumber *longitutde = locations[@"coordinate"][@"longitude"];
-                if([[allInfo locationList] containsObject:@{
-                                                            @"name":topBusinessJSON[@"name"],
-                                                            @"userInput":term,
-                                                            @"latitude":latitude,
-                                                            @"longitude":longitutde}]){
+                
+                
+                NSMutableDictionary *tmpObject = [[NSMutableDictionary alloc] init];
+                [tmpObject setObject:topBusinessJSON[@"name"] forKey:@"name"];
+                [tmpObject setObject:term forKey:@"userInput"];
+                [tmpObject setObject:latitude forKey:@"latitude"];
+                [tmpObject setObject:longitutde forKey:@"longitude"];
+                
+                BOOL termContained= NO;
+                for(int i=0; i<[[allInfo locationList] count]; i++){
+                    if([[allInfo locationList] objectAtIndex:i][@"userInput"]==term){
+                        termContained=YES;
+                    }
+                }
+                
+                if(termContained){
+                    
                 }
                 else{
-                    [[allInfo locationList] addObject:@{
-                        @"name":topBusinessJSON[@"name"],
-                        @"userInput":term,
-                        @"latitude":latitude,
-                        @"longitude":longitutde}];
+                    [[allInfo locationList] addObject:tmpObject];
                 }
             }
         dispatch_group_leave(requestGroup);
@@ -135,10 +137,6 @@ int counter = 0;
     NSString *destLoc = [[NSString alloc] init];
     int colorCode = 0;
     for(int i=0; i<[[allInfo locationList] count]; i++){
-        
-        //TODO: find out why this is being called exactly twice starting second time
-        
-//        NSLog(@"Mapping an item with index %d", i);
         //make sure that we get directions in order
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo userInputs][i][@"type"]];
         NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
@@ -181,7 +179,6 @@ int counter = 0;
                              };
     
     NSURLRequest *directionRequest = [NSURLRequest requestWithHost:kAPIHost path:kAPIPath params:params];
-    //    NSString *requestPath = [[directionRequest URL] absoluteString];
     NSURLSession *session = [NSURLSession sharedSession];
     [[session dataTaskWithRequest:directionRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         
@@ -210,9 +207,7 @@ int counter = 0;
 
 -(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     
-    //TODO: The length of eventList is as expected. After two rounds unexpected length for location list. Fix this.
     SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
-//    [[allInfo eventList] removeAllObjects];
     
     counter=0;
     
@@ -222,23 +217,20 @@ int counter = 0;
         DataViewController *controller = (DataViewController *)segue.destinationViewController;
         controller.eventType = eventTypeInput;
         
-        
-        //TODO: Find out why this crashes after multiple cycles
-        
-//        for(int i=0; i<[[allInfo locationList] count]; i++){
         for(int i=0; i<[allInfo size]; i++){
             NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo locationList][i][@"userInput"]];
             NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
             NSDictionary *location = filteredArray[0];
-            if([[allInfo eventList] containsObject:@{@"name":location[@"name"],
-                                                     @"type":location[@"userInput"]}]==NO){
-                [[allInfo eventList] addObject:@{@"name":location[@"name"],
-                                           @"type":location[@"userInput"]}];
+            
+            NSMutableDictionary *tmpObject = [[NSMutableDictionary alloc] init];
+            [tmpObject setObject:location[@"name"] forKey:@"name"];
+            [tmpObject setObject:location[@"userInput"] forKey:@"type"];
+    
+            if([[allInfo eventList] containsObject:tmpObject]==NO){
+                [[allInfo eventList] addObject:tmpObject];
             }
         }
         controller.eventList =  [allInfo eventList];
-//        [locationList removeAllObjects];
-//        [eventList removeAllObjects];
     }
   };
 
@@ -261,17 +253,11 @@ int counter = 0;
      didUpdateLocations:(NSArray *)locations {
     if(counter<1){
         counter++;
-//        NSLog(@"****In corelocation****");
         // If it's a relatively recent event, turn off updates to save power.
         CLLocation* location = [locations lastObject];
         NSDate* eventDate = location.timestamp;
         NSTimeInterval howRecent = [eventDate timeIntervalSinceNow];
-        if (fabs(howRecent) < 15.0) {
-            // If the event is recent, do something with it.
-    //        NSLog(@"latitude %+.6f, longitude %+.6f\n",	
-    //              location.coordinate.latitude,
-    //              location.coordinate.longitude);
-        }
+        
         [locationManager stopUpdatingLocation];
         
         NSString* cll=[NSString stringWithFormat:@"%f,%f", location.coordinate.latitude, location.coordinate.longitude];
