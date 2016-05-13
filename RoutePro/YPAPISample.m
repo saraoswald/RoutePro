@@ -33,36 +33,44 @@ static NSString * const kSearchLimit       = @"10";
         if (!error && httpResponse.statusCode == 200) {
             
             NSMutableDictionary *searchResponseJSON = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-            NSArray *businessArray = searchResponseJSON[@"businesses"];
             
-            NSMutableDictionary *tmpObject = [[NSMutableDictionary alloc] init];
-            [tmpObject setObject:term forKey:@"type"];
-            [tmpObject setObject:businessArray forKey:@"bArray"];
-            if([[allInfo CachedBusinesses] containsObject:tmpObject]==NO){
-                [[allInfo CachedBusinesses] addObject:tmpObject];
-            }
-            else{
-//                NSLog(@"This object already existed in CachedBusinesses");
-            }
-            if ([businessArray count] > 0) {
-                NSDictionary *firstBusiness = [businessArray firstObject];
-                NSString *firstBusinessID = firstBusiness[@"id"];
+            if([searchResponseJSON[@"businesses"] count]>0){
+                NSArray *businessArray = searchResponseJSON[@"businesses"];
                 
                 NSMutableDictionary *tmpObject = [[NSMutableDictionary alloc] init];
                 [tmpObject setObject:term forKey:@"type"];
-                [tmpObject setObject:firstBusiness[@"name"] forKey:@"bName"];
-                
-                if([[allInfo SelectedBusinesses] containsObject:tmpObject]==NO){
-                    [[allInfo SelectedBusinesses] addObject:tmpObject];
+                [tmpObject setObject:businessArray forKey:@"bArray"];
+                if([[allInfo CachedBusinesses] containsObject:tmpObject]==NO){
+                    [[allInfo CachedBusinesses] addObject:tmpObject];
                 }
-                
-                [self queryBusinessInfoForBusinessId:firstBusinessID completionHandler:completionHandler];
-            } else {
-                completionHandler(nil, error); // No business was found
+                else{
+    //                NSLog(@"This object already existed in CachedBusinesses");
+                }
+                if ([businessArray count] > 0) {
+                    NSDictionary *firstBusiness = [businessArray firstObject];
+                    NSString *firstBusinessID = firstBusiness[@"id"];
+                    
+                    NSMutableDictionary *tmpObject = [[NSMutableDictionary alloc] init];
+                    [tmpObject setObject:term forKey:@"type"];
+                    [tmpObject setObject:firstBusiness[@"name"] forKey:@"bName"];
+                    
+                    if([[allInfo SelectedBusinesses] containsObject:tmpObject]==NO){
+                        [[allInfo SelectedBusinesses] addObject:tmpObject];
+                    }
+                    
+                    [self queryBusinessInfoForBusinessId:firstBusinessID completionHandler:completionHandler];
+                }
+                else {
+                    completionHandler(nil, error); // No business was found
+                }
             }
-        } else {
-            completionHandler(nil, error); // An error happened or the HTTP response is not a 200 OK
+            else {
+                [allInfo setSize:[allInfo size]-1];
+                [[allInfo userInputs] removeAllObjects];
+                completionHandler(nil, error); // An error happened or the HTTP response is not a 200 OK
+            }
         }
+        
     }] resume];
 }
 
