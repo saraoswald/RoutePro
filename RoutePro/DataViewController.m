@@ -16,18 +16,19 @@
 @synthesize eventList;
 @synthesize untrackedChanges;
 
+
+/* On load, populate the scrollview with any events that have been queried */
 - (void)viewDidLoad {
     [super viewDidLoad];
     untrackedChanges=0;
     SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
     
-    //SETFORREMOVAL
     if(!eventList){
         eventList = [[NSMutableArray alloc] init];
     }
     
-    // make Timeline on side of view
     
+    // make Timeline on side of view
     int scrollViewHeight = 1000;
     [self.scrollView setContentSize:CGSizeMake(300, scrollViewHeight)];
     
@@ -35,7 +36,7 @@
     [self.scrollView addSubview:timeLine];
 
     
-    
+    // load events into timeline
     UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
     UIColor *white = [UIColor colorWithWhite:1.0 alpha:1.0];
     int leftmargin = 50;
@@ -45,16 +46,6 @@
         UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*100)+10, width, 90)];
         [newEvent setTextColor:white];
         [newEvent setBackgroundColor:turquoise];
-        //TODO: find out why sometimes events are shown out of order in which they were input. Maybe switch to filters used in MVC.
-        
-        
-//        UILabel *newTransit = [[UILabel alloc] initWithFrame:CGRectMake(0, -33, width, 30)];
-//        [newTransit setTextColor:turquoise];
-//        [newTransit setFont:[UIFont systemFontOfSize:12]];
-//        [newTransit setTextAlignment:NSTextAlignmentCenter];
-//        [newTransit setText:@"walk for 10 mins"];
-//        newTransit.numberOfLines = 0;
-//        [newEvent addSubview:newTransit];
         
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo userInputs][i][@"type"]];
         NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
@@ -91,32 +82,34 @@
 }
 
 
-- (void)rerollItem: (int) index{
-    SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
-    [allInfo rerollItem:index];
-}
 
 /* Callback functions for finger presses */
 
+// when plus sign is pressed
 - (IBAction)addEventPressed:(UIButton*)sender{
-    //TODO: possibly make allInfo a property of the class
+    // get data from Yelp API
     SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
+    
+    // if the text field isn't empty
     if(![self.eventTypeField.text  isEqual: @""]){
         eventType = self.eventTypeField.text;
         
+        // for calculating how far down to place boxes
         int numSubviews = (int)[[self.scrollView subviews] count] - 2;
         if (numSubviews < 0)
             numSubviews = 1;
-        NSLog(@"subviews: %d",numSubviews);
+        // save input
         if([[allInfo userInputs] containsObject:@{@"name": eventType,
                                                   @"type": eventType}]==NO){
             [[allInfo userInputs] insertObject:@{@"name": eventType,
                                                  @"type": eventType} atIndex:[allInfo size]];
             [allInfo setSize:[allInfo size]+1];
             untrackedChanges=untrackedChanges+1;
+            
             UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
             UIColor *white = [UIColor colorWithWhite:1.0 alpha:1.0];
             
+            // create a label to place the new event in
             UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(50, (numSubviews*100)+10, 300, 90)];
             [newEvent setTextColor:white];
             [newEvent setBackgroundColor:turquoise];
@@ -134,6 +127,7 @@
             [newEvent addSubview:deleteButton];
             
             
+            // add event as a subview of the scrollview
             [self.scrollView addSubview:newEvent];
             
             
@@ -142,11 +136,14 @@
     }
 }
 
-- (IBAction)goToMap:(UIButton*)sender{
-    [self performSegueWithIdentifier:@"showMap" sender:self];
+/* send rerollitem calls to the SharedBusinessInfo controller */
+
+- (void)rerollItem: (int) index{
+    SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
+    [allInfo rerollItem:index];
 }
 
-// this is to reroll all items
+// reroll all items
 - (IBAction)rerollPressed:(id)sender {
     SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
     for(int i=0; i<[allInfo size]-untrackedChanges; i++){
@@ -155,7 +152,7 @@
     [self redrawWithNewText];
 }
 
-// for single item
+// reroll single item
 -(IBAction)rerollSinglePressed:(id)sender{
     UIButton *s = sender;
     int index = (int)s.superview.tag; // index of the event that needs to be rerolled
@@ -164,7 +161,7 @@
     [self redrawWithNewText];
 }
 
-// for all items
+// remove all items from the scrollview
 - (IBAction)removePressed:(id)sender {
     SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
     [allInfo removeItem:0];
@@ -172,6 +169,7 @@
         [vue removeFromSuperview];
     }
     
+    // add a timeline
     int scrollViewHeight = 1000;
     [self.scrollView setContentSize:CGSizeMake(300, scrollViewHeight)];
     UILabel *timeLine = [self drawTimeLine:scrollViewHeight];
@@ -179,7 +177,7 @@
 }
 
 
-// for single item
+// remove single item from scrollview
 -(IBAction)removeSinglePressed:(id)sender{
     // get index of the event that needs to be deleted
     UIButton *s = sender;
@@ -195,7 +193,7 @@
     
 };
 
-// generate subview for timeline
+// generate subview for timeline based on what time it is
 - (UILabel*) drawTimeLine:(int)scrollViewHeight{
     int leftmargin = 50;
     UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
@@ -261,15 +259,16 @@
     return timeLine;
 }
 
-
+/* Redraw all the events onto the scrollview when needed */
 - (void) redrawWithNewText{
     
-    // delete all subviews
+    // delete all subviews currently in scrollview
     NSArray *viewsToRemove = [self.scrollView subviews];
     for (UIView *v in viewsToRemove) {
         [v removeFromSuperview];
     }
     
+    // add a timeline to the side
     UILabel *timeLine = [self drawTimeLine:1000];
     [self.scrollView addSubview:timeLine];
     
@@ -279,38 +278,28 @@
     // define constants
     UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
     UIColor *white = [UIColor colorWithWhite:1.0 alpha:1.0];
-    UIEdgeInsets insets = {0, 50, 0, 50};
     int leftmargin = 50;
     int width = 300;
     
     // for each line in allInfo
     for(int i=0;i<[allInfo size];i++){
-        
+        // create label in the shape of a box
         UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*100)+10, width, 90)];
         [newEvent setTextColor:white];
         [newEvent setBackgroundColor:turquoise];
-        //TODO: find out why sometimes events are shown out of order in which they were input. Maybe switch to filters used in MVC.
         
-//        UILabel *newTransit = [[UILabel alloc] initWithFrame:CGRectMake(0, -33, width, 30)];
-//        [newTransit setLayoutMargins:insets];
-//        [newTransit setTextColor:turquoise];
-//        //        [newTransit setBackgroundColor:white];
-//        [newTransit setFont:[UIFont systemFontOfSize:12]];
-//        [newTransit setTextAlignment:NSTextAlignmentCenter];
-//        [newTransit setText:@"walk for 10 mins"];
-//        newTransit.numberOfLines = 0;
-//        [newEvent addSubview:newTransit];
-        
+        // populate with data from Yelp API
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo userInputs][i][@"type"]];
         NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
         NSDictionary *location = filteredArray[0];
+        
         NSString *text = [[NSString alloc]init];
-        if([[location objectForKey:@"address"]count]>0){
-            text = [NSString stringWithFormat:@"  %@\r  %@\r  %@",[location objectForKey:@"name"],[location objectForKey:@"address"][0],[location objectForKey:@"userInput"]];
-        }
-        else{
-            text = [NSString stringWithFormat:@"  %@\r  \r  %@",[location objectForKey:@"name"], [location objectForKey:@"userInput"]];
-        }
+                if([[location objectForKey:@"address"]count]>0){
+                        text = [NSString stringWithFormat:@"  %@\r  %@\r  %@",[location objectForKey:@"name"],[location objectForKey:@"address"][0],[location objectForKey:@"userInput"]];
+                    }
+                else{
+                        text = [NSString stringWithFormat:@"  %@\r  \r  %@",[location objectForKey:@"name"], [location objectForKey:@"userInput"]];
+                    }
         [newEvent setText:text];
         newEvent.numberOfLines = 0;
         newEvent.tag = i;
@@ -357,51 +346,13 @@
     return rerollButton;
 }
 
+/* Segue functions */
 
--(void) clearTimeline{
-    SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
-    
-    UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
-    UIColor *white = [UIColor colorWithWhite:1.0 alpha:1.0];
-    UIEdgeInsets insets = {0, 50, 0, 50};
-    int leftmargin = 50;
-    int width = 300;
-    for(int i=0;i<[allInfo size];i++){
-//        UILabel *newTransit = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+10, width, 30)];
-//        [newTransit setLayoutMargins:insets];
-//        [newTransit setTextColor:turquoise];
-//        [newTransit setBackgroundColor:white];
-//        [newTransit setFont:[UIFont systemFontOfSize:12]];
-//        [newTransit setTextAlignment:NSTextAlignmentCenter];
-//        [newTransit setText:@"walk for 10 mins"];
-//        newTransit.numberOfLines = 0;
-//        [self.scrollView addSubview:newTransit];
-    
-        UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*100)+10, width, 90)];
-        [newEvent setTextColor:white];
-        [newEvent setBackgroundColor:turquoise];
-        //TODO: find out why sometimes events are shown out of order in which they were input. Maybe switch to filters used in MVC.
-        
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo userInputs][i][@"type"]];
-        NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
-        NSDictionary *location = filteredArray[0];
-        
-        NSString *text = [NSString stringWithFormat:@"  %@\r  %@\r  %@",[location objectForKey:@"name"],[location objectForKey:@"address"][0],[location objectForKey:@"userInput"]];
-        [newEvent setText:text];
-        newEvent.numberOfLines = 0;
-        
-        
-        // add delete button
-        UIButton *deleteButton = self.makeDeleteButton;
-        [newEvent addSubview:deleteButton];
-        // add reroll button
-        UIButton *rerollButton = self.makeRerollButton;
-        [newEvent addSubview:rerollButton];
-        
-        [self.scrollView addSubview:newEvent];
-        
-    }
+- (IBAction)goToMap:(UIButton*)sender{
+    // need this since the segue is programmed
+    [self performSegueWithIdentifier:@"showMap" sender:self];
 }
+
 
 -(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     if([segue.identifier isEqualToString:@"showMap"]){
