@@ -42,19 +42,19 @@
     int width = 300;
     for(int i=0;i<[allInfo size];i++){
         
-        UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+40, width, 90)];
+        UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*100)+10, width, 90)];
         [newEvent setTextColor:white];
         [newEvent setBackgroundColor:turquoise];
         //TODO: find out why sometimes events are shown out of order in which they were input. Maybe switch to filters used in MVC.
         
-        int numSubviews = (int)[[self.scrollView subviews] count] - 2;
-        UILabel *newTransit = [[UILabel alloc] initWithFrame:CGRectMake(0, -33, width, 30)];
-        [newTransit setTextColor:turquoise];
-        [newTransit setFont:[UIFont systemFontOfSize:12]];
-        [newTransit setTextAlignment:NSTextAlignmentCenter];
-        [newTransit setText:@"walk for 10 mins"];
-        newTransit.numberOfLines = 0;
-        [newEvent addSubview:newTransit];
+        
+//        UILabel *newTransit = [[UILabel alloc] initWithFrame:CGRectMake(0, -33, width, 30)];
+//        [newTransit setTextColor:turquoise];
+//        [newTransit setFont:[UIFont systemFontOfSize:12]];
+//        [newTransit setTextAlignment:NSTextAlignmentCenter];
+//        [newTransit setText:@"walk for 10 mins"];
+//        newTransit.numberOfLines = 0;
+//        [newEvent addSubview:newTransit];
         
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo userInputs][i][@"type"]];
         NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
@@ -104,10 +104,10 @@
     if(![self.eventTypeField.text  isEqual: @""]){
         eventType = self.eventTypeField.text;
         
-        
         int numSubviews = (int)[[self.scrollView subviews] count] - 2;
         if (numSubviews < 0)
             numSubviews = 1;
+        NSLog(@"subviews: %d",numSubviews);
         if([[allInfo userInputs] containsObject:@{@"name": eventType,
                                                   @"type": eventType}]==NO){
             [[allInfo userInputs] insertObject:@{@"name": eventType,
@@ -117,7 +117,7 @@
             UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
             UIColor *white = [UIColor colorWithWhite:1.0 alpha:1.0];
             
-            UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(50, (numSubviews*100)+40, 300, 90)];
+            UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(50, (numSubviews*100)+10, 300, 90)];
             [newEvent setTextColor:white];
             [newEvent setBackgroundColor:turquoise];
             NSString *text = [NSString stringWithFormat:@"  %@\r%@",eventType,@"  9am"];
@@ -286,31 +286,26 @@
     // for each line in allInfo
     for(int i=0;i<[allInfo size];i++){
         
-        UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+40, width, 90)];
+        UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*100)+10, width, 90)];
         [newEvent setTextColor:white];
         [newEvent setBackgroundColor:turquoise];
         //TODO: find out why sometimes events are shown out of order in which they were input. Maybe switch to filters used in MVC.
         
-        UILabel *newTransit = [[UILabel alloc] initWithFrame:CGRectMake(0, -33, width, 30)];
-        [newTransit setLayoutMargins:insets];
-        [newTransit setTextColor:turquoise];
-        //        [newTransit setBackgroundColor:white];
-        [newTransit setFont:[UIFont systemFontOfSize:12]];
-        [newTransit setTextAlignment:NSTextAlignmentCenter];
-        [newTransit setText:@"walk for 10 mins"];
-        newTransit.numberOfLines = 0;
-        [newEvent addSubview:newTransit];
+//        UILabel *newTransit = [[UILabel alloc] initWithFrame:CGRectMake(0, -33, width, 30)];
+//        [newTransit setLayoutMargins:insets];
+//        [newTransit setTextColor:turquoise];
+//        //        [newTransit setBackgroundColor:white];
+//        [newTransit setFont:[UIFont systemFontOfSize:12]];
+//        [newTransit setTextAlignment:NSTextAlignmentCenter];
+//        [newTransit setText:@"walk for 10 mins"];
+//        newTransit.numberOfLines = 0;
+//        [newEvent addSubview:newTransit];
         
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo userInputs][i][@"type"]];
         NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
         NSDictionary *location = filteredArray[0];
-        NSString *text= [[NSString alloc] init];
-        if([[location objectForKey:@"address"]count]>0){
-            text = [NSString stringWithFormat:@"  %@\r  %@\r  %@",[location objectForKey:@"name"],[location objectForKey:@"address"][0],[location objectForKey:@"userInput"]];
-        }
-        else{
-            text = [NSString stringWithFormat:@"  %@\r  \r  %@",[location objectForKey:@"name"], [location objectForKey:@"userInput"]];
-        }
+        
+        NSString *text = [NSString stringWithFormat:@"  %@\r  %@\r  %@",[location objectForKey:@"name"],[location objectForKey:@"address"][0],[location objectForKey:@"userInput"]];
         [newEvent setText:text];
         newEvent.numberOfLines = 0;
         newEvent.tag = i;
@@ -367,17 +362,17 @@
     int leftmargin = 50;
     int width = 300;
     for(int i=0;i<[allInfo size];i++){
-        UILabel *newTransit = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+10, width, 30)];
-        [newTransit setLayoutMargins:insets];
-        [newTransit setTextColor:turquoise];
-        [newTransit setBackgroundColor:white];
-        [newTransit setFont:[UIFont systemFontOfSize:12]];
-        [newTransit setTextAlignment:NSTextAlignmentCenter];
-        [newTransit setText:@"walk for 10 mins"];
-        newTransit.numberOfLines = 0;
-        [self.scrollView addSubview:newTransit];
-        
-        UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+40, width, 90)];
+//        UILabel *newTransit = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+10, width, 30)];
+//        [newTransit setLayoutMargins:insets];
+//        [newTransit setTextColor:turquoise];
+//        [newTransit setBackgroundColor:white];
+//        [newTransit setFont:[UIFont systemFontOfSize:12]];
+//        [newTransit setTextAlignment:NSTextAlignmentCenter];
+//        [newTransit setText:@"walk for 10 mins"];
+//        newTransit.numberOfLines = 0;
+//        [self.scrollView addSubview:newTransit];
+    
+        UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*100)+10, width, 90)];
         [newEvent setTextColor:white];
         [newEvent setBackgroundColor:turquoise];
         //TODO: find out why sometimes events are shown out of order in which they were input. Maybe switch to filters used in MVC.
