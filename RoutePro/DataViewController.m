@@ -304,8 +304,13 @@
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo userInputs][i][@"type"]];
         NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
         NSDictionary *location = filteredArray[0];
-        
-        NSString *text = [NSString stringWithFormat:@"  %@\r  %@\r  %@",[location objectForKey:@"name"],[location objectForKey:@"address"][0],[location objectForKey:@"userInput"]];
+        NSString *text = [[NSString alloc]init];
+        if([[location objectForKey:@"address"]count]>0){
+            text = [NSString stringWithFormat:@"  %@\r  %@\r  %@",[location objectForKey:@"name"],[location objectForKey:@"address"][0],[location objectForKey:@"userInput"]];
+        }
+        else{
+            text = [NSString stringWithFormat:@"  %@\r  \r  %@",[location objectForKey:@"name"], [location objectForKey:@"userInput"]];
+        }
         [newEvent setText:text];
         newEvent.numberOfLines = 0;
         newEvent.tag = i;
