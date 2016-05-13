@@ -6,6 +6,15 @@
 #import "SharedBusinessInfo.h"
 
 /**
+ IMPORTANT///////
+ 
+ CREDIT: Class .h and .m files were provided from Yelp API. Modifications were made to original file to include data from SharedBusinessInfo and to handle exceptions and adds to SharedBusinessInfo as we saw fit. Depends on NSURLRequest+OAuth files which came bundled with these.
+ 
+ ////////////////
+ 
+ */
+
+/**
  Default paths and search terms used in this example
  */
 static NSString * const kAPIHost           = @"api.yelp.com";
@@ -40,12 +49,14 @@ static NSString * const kSearchLimit       = @"10";
                 NSMutableDictionary *tmpObject = [[NSMutableDictionary alloc] init];
                 [tmpObject setObject:term forKey:@"type"];
                 [tmpObject setObject:businessArray forKey:@"bArray"];
+                //only add items if there is not an existing list of cached values for the term
                 if([[allInfo CachedBusinesses] containsObject:tmpObject]==NO){
                     [[allInfo CachedBusinesses] addObject:tmpObject];
                 }
                 else{
     //                NSLog(@"This object already existed in CachedBusinesses");
                 }
+                //make sure that we only add a business if the response yielded a list of businesses
                 if ([businessArray count] > 0) {
                     NSDictionary *firstBusiness = [businessArray firstObject];
                     NSString *firstBusinessID = firstBusiness[@"id"];
@@ -75,7 +86,9 @@ static NSString * const kSearchLimit       = @"10";
 }
 
 
-//completionHandler is already defined
+/**
+ Make call to Yelp Business API. Calls to this function originate form queryTopBusinessForInfo and rely on the ID generated from the Yelp Search API.
+ */
 - (void)queryBusinessInfoForBusinessId:(NSString *)businessID completionHandler:(void (^)(NSDictionary *topBusinessJSON, NSError *error))completionHandler {
     
     NSURLSession *session = [NSURLSession sharedSession];

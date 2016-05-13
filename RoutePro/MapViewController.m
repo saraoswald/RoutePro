@@ -35,15 +35,10 @@ int counter = 0;
 @synthesize locationList;
 @synthesize colorList;
 
-//TODO: Implement protocol for cases where Yelp API returns no results
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
-    
-    //Instead of removing all objects, in getData check if item that will be searched for is already in locationlist. If not, search for it. Problem is that this prevents repeats (ie: can't double taco)
-//    [[allInfo locationList] removeAllObjects];
-    
+    //create list of colors for different polylines
     colorList = [[NSMutableArray alloc] init];
     [colorList addObject:[UIColor redColor]];
     [colorList addObject:[UIColor blueColor]];
@@ -51,6 +46,8 @@ int counter = 0;
     [colorList addObject:[UIColor blackColor]];
     [colorList addObject:[UIColor yellowColor]];
     
+    
+    //find user location using corelocation framework
     if([CLLocationManager locationServicesEnabled]){
         locationManager = [[CLLocationManager alloc] init];
         [locationManager requestWhenInUseAuthorization];
@@ -67,6 +64,53 @@ int counter = 0;
     
 }
 
+/**
+ Find and return user coordinates using corelocation
+ @return user location formatted as a string
+ */
+- (NSString *)deviceLocation
+{
+    NSString *theLocation = [NSString stringWithFormat:@"latitude: %f longitude: %f", self.locationManager.location.coordinate.latitude, self.locationManager.location.coordinate.longitude];
+    return theLocation;
+}
+
+// Delegate method from the CLLocationManagerDelegate protocol.
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error{
+    NSLog(@"didFailWithError: %@", error);
+    UIAlertController *errorAlert = [UIAlertController alertControllerWithTitle:@"Critical error" message:@"Couldn't find your location" preferredStyle:UIAlertControllerStyleAlert];
+    [self presentViewController:errorAlert animated:NO completion:nil];
+}
+
+/**
+ Find user location, if location is found then make calls to getData and mapData
+ @param manager: delegate method for CLocation
+ @param locations: locations to be mapped
+*/
+- (void)locationManager:(CLLocationManager *)manager
+     didUpdateLocations:(NSArray *)locations {
+    if(counter<1){
+        counter++;
+        CLLocation* location = [locations lastObject];
+        NSDate* eventDate = location.timestamp;
+        NSTimeInterval howRecent = [eventDate timeIntervalSinceNow];
+        
+        [locationManager stopUpdatingLocation];
+        
+        NSString* cll=[NSString stringWithFormat:@"%f,%f", location.coordinate.latitude, location.coordinate.longitude];
+        
+        //get data that will be mapped
+        [self getData:@"New York, NY" cll:cll];
+        //in main thread map the data
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self mapData:cll];
+        });
+    }
+}
+/**
+ Get data for a given location based on YPAPI calls and user location
+ @param defaultLocation: location that is being queried
+ @param cll: user's current lat and long
+ */
 - (void) getData: (NSString*)defaultLocation cll:(NSString*)cll{
     dispatch_group_t requestGroup = dispatch_group_create();
     SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
@@ -83,10 +127,12 @@ int counter = 0;
         [APISample queryTopBusinessInfoForTerm:term location:location cll:cll completionHandler:^(NSDictionary *topBusinessJSON, NSError *error) {
             
             if (error) {
+                //problems connecting to Yelp API
                 NSLog(@"An error happened during the request: %@", error);
             }
             
             else if (topBusinessJSON) {
+                //Connected to Yelp API, got some kind of response
                 NSDictionary* locations = topBusinessJSON[@"location"];
                 NSNumber *latitude = locations[@"coordinate"][@"latitude"];
                 NSNumber *longitutde = locations[@"coordinate"][@"longitude"];
@@ -119,8 +165,10 @@ int counter = 0;
     dispatch_group_wait(requestGroup, DISPATCH_TIME_FOREVER);
 }
 
-
-//to be called after getData, must be in main thread
+/**
+ Map all of the locations selected from locationList and center map around user's current lat and long. Function can only be called in main thread otherwise GMS will fail.
+ @param cll: user's current lat and long
+ */
 - (void) mapData: (NSString*)cll{
     SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
     //centers map on user location
@@ -165,11 +213,18 @@ int counter = 0;
        forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:newEvent];
 }
-
+/**
+ Perform segue to DVC
+ */
 -(void) buttonClicked{
     [self performSegueWithIdentifier:@"showForm" sender:self];
 }
-
+/**
+ Query google directions API to get a polyline. Map this polyline using the next color in colorlist. Colors in order are as inserted into colorList.
+ @param: startCoordinates: coordinates at starting location
+ @param: destinationCoordinates: coordinates to which the polyline should lead
+ @param colorCode: index of color, index is in ColorList
+ */
 - (void) getDirectionsBetween2Points: (NSString*) startCoordinates destinationCoordinates: (NSString*)destinationCoordinates colorCode: (int) colorCode{
     colorCode = colorCode % [colorList count];
     kOriginCoor = startCoordinates;
@@ -181,13 +236,14 @@ int counter = 0;
     
     NSURLRequest *directionRequest = [NSURLRequest requestWithHost:kAPIHost path:kAPIPath params:params];
     NSURLSession *session = [NSURLSession sharedSession];
+    //request directions from google directions API
     [[session dataTaskWithRequest:directionRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
         
         if (!error && httpResponse.statusCode == 200) {
             NSDictionary *searchResponseJSON = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-            
+            //draw the actual polyline
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSMutableArray *routes =searchResponseJSON[@"routes"];
                 NSDictionary *firstRoute = routes[0];
@@ -212,13 +268,11 @@ int counter = 0;
     
     counter=0;
     
-    //TODO: Probably need to make YPAPI calls in DVC otherwise can't get business names and stuff without first visiting MVC
-    
     if([segue.identifier isEqualToString:@"showForm"]){
         DataViewController *controller = (DataViewController *)segue.destinationViewController;
         controller.eventType = eventTypeInput;
         
-        for(int i=0; i<[allInfo size]; i++){
+        for(int i=0; i<[[allInfo locationList] count]; i++){
             NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo locationList][i][@"userInput"]];
             NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
             NSDictionary *location = filteredArray[0];
@@ -235,37 +289,4 @@ int counter = 0;
     }
   };
 
-
-// Method to return user coordinates
-- (NSString *)deviceLocation
-{
-    NSString *theLocation = [NSString stringWithFormat:@"latitude: %f longitude: %f", self.locationManager.location.coordinate.latitude, self.locationManager.location.coordinate.longitude];
-    return theLocation;
-}
-
-// Delegate method from the CLLocationManagerDelegate protocol.
-- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error{
-    NSLog(@"didFailWithError: %@", error);
-    UIAlertController *errorAlert = [UIAlertController alertControllerWithTitle:@"Critical error" message:@"Couldn't find your location" preferredStyle:UIAlertControllerStyleAlert];
-    [self presentViewController:errorAlert animated:NO completion:nil];
-}
-
-- (void)locationManager:(CLLocationManager *)manager
-     didUpdateLocations:(NSArray *)locations {
-    if(counter<1){
-        counter++;
-        // If it's a relatively recent event, turn off updates to save power.
-        CLLocation* location = [locations lastObject];
-        NSDate* eventDate = location.timestamp;
-        NSTimeInterval howRecent = [eventDate timeIntervalSinceNow];
-        
-        [locationManager stopUpdatingLocation];
-        
-        NSString* cll=[NSString stringWithFormat:@"%f,%f", location.coordinate.latitude, location.coordinate.longitude];
-        [self getData:@"New York, NY" cll:cll];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self mapData:cll];
-        });
-    }
-}
 @end

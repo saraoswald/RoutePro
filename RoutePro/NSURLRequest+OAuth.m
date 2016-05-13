@@ -9,6 +9,17 @@
 #import <TDOAuth/TDOAuth.h>
 
 /**
+ IMPORTANT///////
+ 
+ CREDIT: Class .h and .m files were provided from Yelp API. Only minor modifications (the values of the static strings) have been added. This implementation was bundled with YAPISample
+ 
+ ////////////////
+
+ */
+
+
+
+/**
  OAuth credential placeholders that must be filled by each user in regards to
  http://www.yelp.com/developers/getting_started/api_access
  */
