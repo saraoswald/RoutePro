@@ -30,5 +30,6 @@
 - (NSMutableArray*) rerollItem: (int) index;
 - (void)addText;
 - (void)resetItems;
+- (void) removeItem: (int) index;
 
 @end

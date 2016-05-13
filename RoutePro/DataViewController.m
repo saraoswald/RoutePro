@@ -191,7 +191,7 @@
 
 - (IBAction)removePressed:(id)sender {
     SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
-    [allInfo resetItems];
+    [allInfo removeItem:0];
     for (UIView* vue in self.scrollView.subviews){
         [vue removeFromSuperview];
     }
@@ -305,47 +305,47 @@
     }
 }
 
--(void) clearTimeline{
-    SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
-    NSMutableString *displayEventList = [[NSMutableString alloc] init];
-    NSString *temp = [[NSString alloc] init];
-    for(int i=0;i<[allInfo size]; i++){
-        temp = [NSString stringWithFormat:@"eventList[%d] = %@,%@\n",i,[[allInfo eventList][i] objectForKey:@"name"],[[allInfo eventList][i] objectForKey:@"type"]];
-        [displayEventList appendString:temp];
-    }
-    
-    UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
-    UIColor *white = [UIColor colorWithWhite:1.0 alpha:1.0];
-    UIEdgeInsets insets = {0, 50, 0, 50};
-    int leftmargin = 50;
-    int width = 300;
-    for(int i=0;i<[allInfo size];i++){
-        UILabel *newTransit = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+10, width, 30)];
-        [newTransit setLayoutMargins:insets];
-        [newTransit setTextColor:turquoise];
-        [newTransit setBackgroundColor:white];
-        [newTransit setFont:[UIFont systemFontOfSize:12]];
-        [newTransit setTextAlignment:NSTextAlignmentCenter];
-        [newTransit setText:@"walk for 10 mins"];
-        newTransit.numberOfLines = 0;
-        [self.scrollView addSubview:newTransit];
-        
-        UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+40, width, 90)];
-        [newEvent setTextColor:white];
-        [newEvent setBackgroundColor:turquoise];
-        //TODO: find out why sometimes events are shown out of order in which they were input. Maybe switch to filters used in MVC.
-        
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo userInputs][i][@"type"]];
-        NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
-        NSDictionary *location = filteredArray[0];
-        
-        NSString *text = [NSString stringWithFormat:@"  %@\r  %@\r  %@",[location objectForKey:@"name"],[location objectForKey:@"address"][0],[location objectForKey:@"userInput"]];
-        [newEvent setText:text];
-        newEvent.numberOfLines = 0;
-        [self.scrollView addSubview:newEvent];
-        
-    }
-}
+//-(void) clearTimeline{
+//    SharedBusinessInfo *allInfo = [SharedBusinessInfo sharedBusinessInfo];
+//    NSMutableString *displayEventList = [[NSMutableString alloc] init];
+//    NSString *temp = [[NSString alloc] init];
+//    for(int i=0;i<[allInfo size]; i++){
+//        temp = [NSString stringWithFormat:@"eventList[%d] = %@,%@\n",i,[[allInfo eventList][i] objectForKey:@"name"],[[allInfo eventList][i] objectForKey:@"type"]];
+//        [displayEventList appendString:temp];
+//    }
+//    
+//    UIColor *turquoise = [UIColor colorWithRed:(97.0/255.0) green:(195.0/255.0) blue:(139.0/255.0) alpha:1];
+//    UIColor *white = [UIColor colorWithWhite:1.0 alpha:1.0];
+//    UIEdgeInsets insets = {0, 50, 0, 50};
+//    int leftmargin = 50;
+//    int width = 300;
+//    for(int i=0;i<[allInfo size];i++){
+//        UILabel *newTransit = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+10, width, 30)];
+//        [newTransit setLayoutMargins:insets];
+//        [newTransit setTextColor:turquoise];
+//        [newTransit setBackgroundColor:white];
+//        [newTransit setFont:[UIFont systemFontOfSize:12]];
+//        [newTransit setTextAlignment:NSTextAlignmentCenter];
+//        [newTransit setText:@"walk for 10 mins"];
+//        newTransit.numberOfLines = 0;
+//        [self.scrollView addSubview:newTransit];
+//        
+//        UILabel *newEvent = [[UILabel alloc] initWithFrame:CGRectMake(leftmargin, (i*140)+40, width, 90)];
+//        [newEvent setTextColor:white];
+//        [newEvent setBackgroundColor:turquoise];
+//        //TODO: find out why sometimes events are shown out of order in which they were input. Maybe switch to filters used in MVC.
+//        
+//        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userInput == %@", [allInfo userInputs][i][@"type"]];
+//        NSArray *filteredArray = [[allInfo locationList] filteredArrayUsingPredicate:predicate];
+//        NSDictionary *location = filteredArray[0];
+//        
+//        NSString *text = [NSString stringWithFormat:@"  %@\r  %@\r  %@",[location objectForKey:@"name"],[location objectForKey:@"address"][0],[location objectForKey:@"userInput"]];
+//        [newEvent setText:text];
+//        newEvent.numberOfLines = 0;
+//        [self.scrollView addSubview:newEvent];
+//        
+//    }
+//}
 
 -(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     if([segue.identifier isEqualToString:@"showMap"]){
