@@ -135,9 +135,6 @@
             // add delete button
             UIButton *deleteButton = self.makeDeleteButton;
             [newEvent addSubview:deleteButton];
-            // add reroll button
-            UIButton *rerollButton = self.makeRerollButton;
-            [newEvent addSubview:rerollButton];
 
 
             [self.scrollView addSubview:newEvent];
