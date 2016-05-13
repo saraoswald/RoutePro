@@ -126,8 +126,10 @@
     //get the specific entry indexed by order of user inputs
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == %@", userInputs[index][@"type"]];
     NSArray *filteredArray = [CachedBusinesses filteredArrayUsingPredicate:predicate];
-    NSMutableArray *businesses = filteredArray[0][@"bArray"];
-    
+    NSMutableArray *businesses = [[NSMutableArray alloc]init];
+    if([filteredArray count]>0){
+        businesses = filteredArray[0][@"bArray"];
+    }
     //remove the first object, the second becomes the new item that will be used
     NSMutableArray *tmp = [[NSMutableArray alloc] init];
     for(int i=1; i<[businesses count]; i++){
