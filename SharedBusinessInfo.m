@@ -53,58 +53,60 @@
 
 - (void)removeItem: (int) index{
     //removes from userInputs
-    NSString *term = userInputs[index][@"type"];
-    [userInputs removeObjectAtIndex:index];
-    
-    //remove from locationList
-    int llindex = -1;
-    for(int i=0; i<[locationList count]; i++){
-        if([locationList objectAtIndex:i][@"userInput"]==term){
-            llindex = i;
+    if(index<[userInputs count]){
+        NSString *term = userInputs[index][@"type"];
+        [userInputs removeObjectAtIndex:index];
+        
+        //remove from locationList
+        int llindex = -1;
+        for(int i=0; i<[locationList count]; i++){
+            if([locationList objectAtIndex:i][@"userInput"]==term){
+                llindex = i;
+            }
         }
-    }
-    //only remove if the element was actually found
-    if(llindex != -1){
-        [locationList removeObjectAtIndex:llindex];
-    }
-    
-    //remove from eventList
-    int eventindex = -1;
-    for(int i=0; i<[eventList count]; i++){
-        if([eventList objectAtIndex:i][@"type"]==term){
-            eventindex = i;
+        //only remove if the element was actually found
+        if(llindex != -1){
+            [locationList removeObjectAtIndex:llindex];
         }
-    }
-    //only remove if the element was actually found
-    if(eventindex != -1){
-        [eventList removeObjectAtIndex:eventindex];
-    }
-    
-    //remove from SelectedBusinesses
-    int selectindex = -1;
-    for(int i=0; i<[SelectedBusinesses count]; i++){
-        if([SelectedBusinesses objectAtIndex:i][@"type"]==term){
-            selectindex = i;
+        
+        //remove from eventList
+        int eventindex = -1;
+        for(int i=0; i<[eventList count]; i++){
+            if([eventList objectAtIndex:i][@"type"]==term){
+                eventindex = i;
+            }
         }
-    }
-    //only remove if the element was actually found
-    if(selectindex != -1){
-        [SelectedBusinesses removeObjectAtIndex:selectindex];
-    }
-    
-    //remove from CachedBusinesses
-    int cachedindex = -1;
-    for(int i=0; i<[CachedBusinesses count]; i++){
-        if([CachedBusinesses objectAtIndex:i][@"type"]==term){
-            cachedindex = i;
+        //only remove if the element was actually found
+        if(eventindex != -1){
+            [eventList removeObjectAtIndex:eventindex];
         }
+        
+        //remove from SelectedBusinesses
+        int selectindex = -1;
+        for(int i=0; i<[SelectedBusinesses count]; i++){
+            if([SelectedBusinesses objectAtIndex:i][@"type"]==term){
+                selectindex = i;
+            }
+        }
+        //only remove if the element was actually found
+        if(selectindex != -1){
+            [SelectedBusinesses removeObjectAtIndex:selectindex];
+        }
+        
+        //remove from CachedBusinesses
+        int cachedindex = -1;
+        for(int i=0; i<[CachedBusinesses count]; i++){
+            if([CachedBusinesses objectAtIndex:i][@"type"]==term){
+                cachedindex = i;
+            }
+        }
+        //only remove if the element was actually found
+        if(cachedindex != -1){
+            [CachedBusinesses removeObjectAtIndex:cachedindex];
+        }
+        
+        size = size-1;
     }
-    //only remove if the element was actually found
-    if(cachedindex != -1){
-        [CachedBusinesses removeObjectAtIndex:cachedindex];
-    }
-    
-    size = size-1;
     return;
 }
 
@@ -124,40 +126,43 @@
     businesses = tmp;
     
     //this is the new business that we have chosen for the replacement
-    NSMutableDictionary *newBusinessInfo = businesses[0];
-    
-    //this should reaplce the value of the bArray with the bArray that has removed a value
-    NSUInteger replaceIndex = [CachedBusinesses indexOfObject:filteredArray[0]];
-//    int replacementIndex = (int) replaceIndex;
-    CachedBusinesses[replaceIndex][@"bArray"]=businesses;
-    
-    //now replace value in selected array
-    NSArray *filteredArray2 = [SelectedBusinesses filteredArrayUsingPredicate:predicate];
-    NSUInteger replaceIndex2 = [SelectedBusinesses indexOfObject:filteredArray2[0]];
-//    int replacementIndex2 = (int) replaceIndex2;
-    SelectedBusinesses[replaceIndex2][@"name"]=newBusinessInfo[@"name"];
-    
-    //now change value in event list
-    NSArray *filteredArray3 = [eventList filteredArrayUsingPredicate:predicate];
-    NSUInteger replaceIndex3 = [eventList indexOfObject:filteredArray3[0]];
-//    int replacementIndex3 = (int) replaceIndex3;
-    eventList[replaceIndex3][@"name"]=newBusinessInfo[@"name"];
-    
-    //now change the value in locationList
-    NSPredicate *predicate2 = [NSPredicate predicateWithFormat:@"userInput == %@", userInputs[index][@"type"]];
-    NSArray *filteredArray4 = [locationList filteredArrayUsingPredicate:predicate2];
-    NSUInteger replaceIndex4 = [locationList indexOfObject:filteredArray4[0]];
-    locationList[replaceIndex4][@"name"]=newBusinessInfo[@"name"];
-    locationList[replaceIndex4][@"latitude"]=newBusinessInfo[@"location"][@"coordinate"][@"latitude"];
-    locationList[replaceIndex4][@"longitude"]=newBusinessInfo[@"location"][@"coordinate"][@"longitude"];
-    locationList[replaceIndex4][@"address"]=newBusinessInfo[@"location"][@"address"];
-//
-//    [tmpObject setObject:topBusinessJSON[@"name"] forKey:@"name"];
-//    [tmpObject setObject:term forKey:@"userInput"];
-//    [tmpObject setObject:latitude forKey:@"latitude"];
-//    [tmpObject setObject:longitutde forKey:@"longitude"];
-    
-    return newBusinessInfo;
+    if([businesses count]>0){
+        NSMutableDictionary *newBusinessInfo = businesses[0];
+        
+        //this should reaplce the value of the bArray with the bArray that has removed a value
+        NSUInteger replaceIndex = [CachedBusinesses indexOfObject:filteredArray[0]];
+    //    int replacementIndex = (int) replaceIndex;
+        CachedBusinesses[replaceIndex][@"bArray"]=businesses;
+        
+        //now replace value in selected array
+        NSArray *filteredArray2 = [SelectedBusinesses filteredArrayUsingPredicate:predicate];
+        NSUInteger replaceIndex2 = [SelectedBusinesses indexOfObject:filteredArray2[0]];
+    //    int replacementIndex2 = (int) replaceIndex2;
+        SelectedBusinesses[replaceIndex2][@"name"]=newBusinessInfo[@"name"];
+        
+        //now change value in event list
+        NSArray *filteredArray3 = [eventList filteredArrayUsingPredicate:predicate];
+        NSUInteger replaceIndex3 = [eventList indexOfObject:filteredArray3[0]];
+    //    int replacementIndex3 = (int) replaceIndex3;
+        eventList[replaceIndex3][@"name"]=newBusinessInfo[@"name"];
+        
+        //now change the value in locationList
+        NSPredicate *predicate2 = [NSPredicate predicateWithFormat:@"userInput == %@", userInputs[index][@"type"]];
+        NSArray *filteredArray4 = [locationList filteredArrayUsingPredicate:predicate2];
+        NSUInteger replaceIndex4 = [locationList indexOfObject:filteredArray4[0]];
+        locationList[replaceIndex4][@"name"]=newBusinessInfo[@"name"];
+        locationList[replaceIndex4][@"latitude"]=newBusinessInfo[@"location"][@"coordinate"][@"latitude"];
+        locationList[replaceIndex4][@"longitude"]=newBusinessInfo[@"location"][@"coordinate"][@"longitude"];
+        locationList[replaceIndex4][@"address"]=newBusinessInfo[@"location"][@"address"];
+    //
+    //    [tmpObject setObject:topBusinessJSON[@"name"] forKey:@"name"];
+    //    [tmpObject setObject:term forKey:@"userInput"];
+    //    [tmpObject setObject:latitude forKey:@"latitude"];
+    //    [tmpObject setObject:longitutde forKey:@"longitude"];
+        
+        return newBusinessInfo;
+    }
+    return [[NSMutableDictionary alloc]init];
 }
 
 - (void)resetItems{
